@@ -89,7 +89,7 @@ sf_snd sf_wavload(const char *file){
 			read_u16le(fp); // block align, ignored
 			bps         = read_u16le(fp);
 
-			// only support 2-channel 16-bit samples
+			// only support 1/2-channel 16-bit samples
 			if (audioformat != 1 || bps != 16 || (numchannels != 1 && numchannels != 2)){
 				sf_snd_free(s);
 				fclose(fp);
@@ -99,7 +99,7 @@ sf_snd sf_wavload(const char *file){
 			// save the sample rate for later
 			s->rate = samplerate;
 
-			//
+			// skip ahead of the rest of the fmt chunk
 			if (chunksize > 16)
 				fseek(fp, chunksize - 16, SEEK_CUR);
 		}
@@ -134,10 +134,8 @@ sf_snd sf_wavload(const char *file){
 			for (int i = 0; i < scount; i++){
 				// read the sample
 				L = (int16_t)read_u16le(fp);
-
-				// expand to stereo
 				if (numchannels == 1)
-					R = L;
+					R = L; // expand to stereo
 				else
 					R = (int16_t)read_u16le(fp);
 
