@@ -35,9 +35,9 @@ static inline sf_snd biquad_filter(sf_snd x, float b0, float b1, float b2, float
 	sf_sample_st yn2 = { 0, 0 };
 
 	// loop for each sample
-	for (int i = 0; i < x->size; i++){
+	for (int n = 0; n < x->size; n++){
 		// get the current sample
-		sf_sample_st xn0 = x->samples[i];
+		sf_sample_st xn0 = x->samples[n];
 
 		// the formula is the same for each channel
 		float L =
@@ -54,13 +54,13 @@ static inline sf_snd biquad_filter(sf_snd x, float b0, float b1, float b2, float
 			a2 * yn2.R;
 
 		// save the result
-		y->samples[i] = (sf_sample_st){ L, R };
+		y->samples[n] = (sf_sample_st){ L, R };
 
 		// slide everything down one sample
 		xn2 = xn1;
 		xn1 = xn0;
 		yn2 = yn1;
-		yn1 = y->samples[i];
+		yn1 = y->samples[n];
 	}
 	return y;
 }
