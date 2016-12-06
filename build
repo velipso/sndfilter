@@ -58,4 +58,5 @@ mkdir -p $TGT_DIR
 
 comp_and_link src/main.c       $TGT_DIR/main.o
 comp_and_link src/wav.c        $TGT_DIR/wav.o
+comp_and_link src/biquad.c     $TGT_DIR/biquad.o
 link_finish $TGT_DIR/sndfilter

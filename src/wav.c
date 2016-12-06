@@ -3,7 +3,6 @@
 // Project Home: https://github.com/voidqk/sndfilter
 
 #include "wav.h"
-#include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
 
@@ -38,7 +37,7 @@ static inline void write_u16le(FILE *fp, uint16_t v){
 }
 
 // load a WAV file (returns NULL for error)
-sf_snd sf_snd_loadwav(const char *file){
+sf_snd sf_wavload(const char *file){
 	FILE *fp = fopen(file, "rb");
 	if (fp == NULL)
 		return NULL;
@@ -58,13 +57,11 @@ sf_snd sf_snd_loadwav(const char *file){
 	}
 
 	// start reading chunks
-	sf_snd s = malloc(sizeof(sf_snd_st));
+	sf_snd s = sf_snd_new();
 	if (s == NULL){
 		fclose(fp);
 		return NULL;
 	}
-	s->samples = NULL;
-	s->size = 0;
 
 	bool found_fmt = false;
 	uint16_t audioformat;
@@ -78,7 +75,7 @@ sf_snd sf_snd_loadwav(const char *file){
 
 			// confirm we haven't already processed the fmt chunk
 			if (found_fmt || chunksize < 16){
-				free(s);
+				sf_snd_free(s);
 				fclose(fp);
 				return NULL;
 			}
@@ -94,7 +91,7 @@ sf_snd sf_snd_loadwav(const char *file){
 
 			// only support 2-channel 16-bit samples
 			if (audioformat != 1 || bps != 16 || (numchannels != 1 && numchannels != 2)){
-				free(s);
+				sf_snd_free(s);
 				fclose(fp);
 				return NULL;
 			}
@@ -110,14 +107,14 @@ sf_snd sf_snd_loadwav(const char *file){
 
 			// confirm we've already processed the fmt chunk
 			if (!found_fmt){
-				free(s);
+				sf_snd_free(s);
 				fclose(fp);
 				return NULL;
 			}
 
 			// confirm chunk size is evenly divisible by bytes per sample
 			if ((chunksize % (numchannels * bps / 8)) != 0){
-				free(s);
+				sf_snd_free(s);
 				fclose(fp);
 				return NULL;
 			}
@@ -127,7 +124,7 @@ sf_snd sf_snd_loadwav(const char *file){
 			s->size = scount;
 			s->samples = malloc(sizeof(sf_sample_st) * scount);
 			if (s->samples == NULL){
-				free(s);
+				sf_snd_free(s);
 				fclose(fp);
 				return NULL;
 			}
@@ -166,21 +163,17 @@ sf_snd sf_snd_loadwav(const char *file){
 	}
 
 	// didn't find data chunk, so fail
-	free(s);
+	sf_snd_free(s);
 	fclose(fp);
 	return NULL;
 }
 
 static float clampf(float v, float min, float max){
-	if (v < min)
-		return min;
-	else if (v > max)
-		return max;
-	return v;
+	return v < min ? min : (v > max ? max : v);
 }
 
 // save a WAV file (returns false for error)
-bool sf_snd_savewav(sf_snd s, const char *file){
+bool sf_wavsave(sf_snd s, const char *file){
 	FILE *fp = fopen(file, "wb");
 	if (fp == NULL)
 		return false;
@@ -224,10 +217,4 @@ bool sf_snd_savewav(sf_snd s, const char *file){
 
 	fclose(fp);
 	return true;
-}
-
-void sf_snd_free(sf_snd snd){
-	if (snd->samples)
-		free(snd->samples);
-	free(snd);
 }

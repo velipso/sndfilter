@@ -10,8 +10,7 @@
 #include "types.h"
 #include <stdbool.h>
 
-sf_snd sf_snd_loadwav(const char *file);
-bool   sf_snd_savewav(sf_snd snd, const char *file);
-void   sf_snd_free(sf_snd snd);
+sf_snd sf_wavload(const char *file);
+bool   sf_wavsave(sf_snd snd, const char *file);
 
 #endif // SNDFILTER_WAV__H
