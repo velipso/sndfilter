@@ -10,8 +10,8 @@
 static inline sf_snd biquad_filter(sf_snd x, float b0, float b1, float b2, float a1, float a2){
 	// the biquad filter processes a sound using 10 parameters:
 	//   b0, b1, b2, a1, a2      transformation coefficients
-	//   xn0, xn1, xn2           the unfiltered sample at position n-0, n-1, and n-2
-	//   yn1, yn2                the filtered sample at position n-1 and n-2
+	//   xn0, xn1, xn2           the unfiltered sample at position x[n], x[n-1], and x[n-2]
+	//   yn1, yn2                the filtered sample at position y[n-1] and y[n-2]
 
 	// allocate a new sound
 	sf_snd y = sf_snd_new();
@@ -72,6 +72,9 @@ static inline sf_snd biquad_filter(sf_snd x, float b0, float b1, float b2, float
 // I have no insight into the genius of the math -- you're on your own for that.  You might find
 // some help in some of the articles here:
 //   http://www.musicdsp.org/showmany.php
+//
+// formulas extracted and massaged from Chromium source, Biquad.cpp, here:
+//   https://git.io/v10H2
 
 sf_snd sf_lowpass(sf_snd snd, float cutoff, float resonance){
 	float nyquist = snd->rate * 0.5f;
