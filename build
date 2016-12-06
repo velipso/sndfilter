@@ -1,0 +1,84 @@
+#!/bin/bash
+
+set -e
+
+pushd "$(dirname "$0")" > /dev/null
+SCRIPT_DIR="$(pwd)"
+popd > /dev/null
+SRC_DIR=$SCRIPT_DIR/src
+TGT_DIR=$SCRIPT_DIR/tgt
+
+#
+# change these functions if you want to build the C files differently
+#
+
+compile_c() { # production compile
+	# $1 : the input .c file
+	# $2 : the output .o file
+	if which clang > /dev/null; then
+		clang -c -o "$2" -fwrapv -Werror "$1"
+	else
+		echo 'ERROR:'
+		echo 'Missing "clang" which is required for building.'
+		echo ''
+		echo 'Aborting build.'
+		echo ''
+		echo 'You can install "clang" by visiting:'
+		echo '   http://llvm.org/'
+		echo ''
+		exit 1
+	fi
+}
+
+compile_c_debug() { # debug compile (should define SINK_DEBUG)
+	# $1 : the input .c file
+	# $2 : the output .o file
+	clang -c -o "$2" -fwrapv -g -DSINK_DEBUG "$1"
+}
+
+link_c() { # production link
+	# $1 : the input .o files (space separated list)
+	# $2 : the output binary file
+	clang -o "$2" $1
+}
+
+link_c_debug() { # debug link
+	# $1 : the input .o files (space separated list)
+	# $2 : the output binary file
+	clang -o "$2" $1
+}
+
+#
+# ---
+#
+
+LINK_FILES=()
+BUILD_DEBUG=0
+comp_and_link() {
+	# $1 : the input .c file
+	# $2 : the output .o file
+	if [ "$BUILD_DEBUG" = "1" ]; then
+		echo "Compiling $(basename "$1") (debug)..."
+		compile_c_debug "$1" "$2"
+	else
+		echo "Compiling $(basename "$1")..."
+		compile_c "$1" "$2"
+	fi
+	LINK_FILES=("${LINK_FILES[@]}" "$2")
+}
+
+link_finish() {
+	# $1 : the output binary
+	if [ "$BUILD_DEBUG" = "1" ]; then
+		echo 'Linking (debug)...'
+		link_c_debug "${LINK_FILES[*]}" "$1"
+	else
+		echo 'Linking...'
+		link_c "${LINK_FILES[*]}" "$1"
+	fi
+}
+
+mkdir -p $TGT_DIR
+
+comp_and_link src/main.c       $TGT_DIR/main.o
+link_finish $TGT_DIR/sndfilter
