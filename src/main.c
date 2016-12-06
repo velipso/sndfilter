@@ -2,8 +2,9 @@
 // MIT License
 // Project Home: https://github.com/voidqk/sndfilter
 
-// main entry point, responsible for parsing command line parameters
+// main entry point, used as a simple demo of the features of the library
 
+#include "biquad.h"
 #include <stdio.h>
 
 int main(int argc, char **argv){
