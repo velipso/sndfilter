@@ -35,5 +35,5 @@ processing.  There are some comments in that file that describe what is happenin
 
 I do not understand the math, so please don't ask me any questions :-).  The core formulas were
 extracted from the [Chromium](https://github.com/nwjs/chromium.src) source code (specifically
-[Biquad.cpp](https://github.com/nwjs/chromium.src/blob/df7f8c8582b9a78c806a7fa1e9d3f3ba51f7a698/third_party/WebKit/Source/platform/audio/Biquad.cpp),
+[Biquad.cpp](https://github.com/nwjs/chromium.src/blob/df7f8c8582b9a78c806a7fa1e9d3f3ba51f7a698/third_party/WebKit/Source/platform/audio/Biquad.cpp)),
 and cleaned up to make it easier to read.
