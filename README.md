@@ -18,14 +18,14 @@ Simply run `./build` and the executable should be `./tgt/sndfilter`.
 Filters
 -------
 
-* Low Pass (Cutoff, Resonance)
-* High Pass (Cutoff, Resonance)
-* Band Pass (Frequency, Q)
-* Notch (Frequency, Q)
-* Peaking (Frequency, Q, Gain)
-* All Pass (Frequency, Q)
-* Low Shelf (Frequency, Q, Gain)
-* High Shelf (Frequency, Q, Gain)
+* [Low-Pass](https://en.wikipedia.org/wiki/Low-pass_filter) (Cutoff, Resonance)
+* [High-Pass](https://en.wikipedia.org/wiki/High-pass_filter) (Cutoff, Resonance)
+* [Band-Pass](https://en.wikipedia.org/wiki/Band-pass_filter) (Frequency, Q)
+* [Notch/Band-stop](https://en.wikipedia.org/wiki/Band-stop_filter) (Frequency, Q)
+* [Peaking](https://en.wikipedia.org/wiki/Equalization_(audio)) (Frequency, Q, Gain)
+* [All-Pass](https://en.wikipedia.org/wiki/All-pass_filter) (Frequency, Q)
+* [Low Shelf](http://www.audiorecording.me/what-is-a-low-shelf-and-high-shelf-filter-in-parametric-equalization.html) (Frequency, Q, Gain)
+* [High Shelf](http://www.audiorecording.me/what-is-a-low-shelf-and-high-shelf-filter-in-parametric-equalization.html) (Frequency, Q, Gain)
 
 Implementation
 --------------
