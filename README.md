@@ -32,3 +32,7 @@ Implementation
 
 The [biquad.c](https://github.com/voidqk/sndfilter/blob/master/src/biquad.c) file is the meat of the
 processing.  There are some comments in that file that describe what is happening.
+
+I do not understand the math, so please don't ask me any questions :-).  The core formulas were
+extracted from the [Chromium](https://github.com/nwjs/chromium.src) source code, and cleaned up to
+make it easier to read.
