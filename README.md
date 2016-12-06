@@ -7,6 +7,8 @@ It's easy to find countless math equations on sound filters, but a bit harder to
 code.  This library is my attempt at cleaning up and presenting the math-heavy filter algorithms for
 the programming community.
 
+(MIT License)
+
 Build Instructions
 ------------------
 
