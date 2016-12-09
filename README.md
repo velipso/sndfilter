@@ -45,6 +45,6 @@ were extracted from
 
 The compressor came from
 [DynamicsCompressorKernel.cpp](https://github.com/nwjs/chromium.src/blob/df7f8c8582b9a78c806a7fa1e9d3f3ba51f7a698/third_party/WebKit/Source/platform/audio/DynamicsCompressorKernel.cpp)
-(also from Chromium), and cleaned up a bit more.  I swaped out the adaptive release curve and
+(also from Chromium), and cleaned up a bit more.  I swapped out the adaptive release curve and
 simplified the knee calculations.  I feel a little more comfortable with that algorithm because
 there isn't a whole lot of magical math involved.
