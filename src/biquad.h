@@ -3,7 +3,7 @@
 // Project Home: https://github.com/voidqk/sndfilter
 
 // biquad filtering based on WebAudio specification:
-//  https://webaudio.github.io/web-audio-api/#the-biquadfilternode-interface
+//   https://webaudio.github.io/web-audio-api/#the-biquadfilternode-interface
 
 #ifndef SNDFILTER_BIQUAD__H
 #define SNDFILTER_BIQUAD__H

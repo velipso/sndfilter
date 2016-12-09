@@ -8,55 +8,11 @@ popd > /dev/null
 SRC_DIR=$SCRIPT_DIR/src
 TGT_DIR=$SCRIPT_DIR/tgt
 
-#
-# change these functions if you want to build the C files differently
-#
-
-compile_c() {
-	# $1 : the input .c file
-	# $2 : the output .o file
-	if which clang > /dev/null; then
-		clang -c -o "$2" -fwrapv -Werror "$1"
-	else
-		echo 'ERROR:'
-		echo 'Missing "clang" which is required for building.'
-		echo ''
-		echo 'Aborting build.'
-		echo ''
-		echo 'You can install "clang" by visiting:'
-		echo '   http://llvm.org/'
-		echo ''
-		exit 1
-	fi
-}
-
-link_c() {
-	# $1 : the input .o files (space separated list)
-	# $2 : the output binary file
-	clang -o "$2" $1
-}
-
-#
-# ---
-#
-
-LINK_FILES=()
-comp_and_link() {
-	# $1 : the input .c file
-	# $2 : the output .o file
-	echo "Compiling $(basename "$1")..."
-	compile_c "$1" "$2"
-	LINK_FILES=("${LINK_FILES[@]}" "$2")
-}
-
-link_finish() {
-	echo 'Linking...'
-	link_c "${LINK_FILES[*]}" "$1"
-}
-
-mkdir -p $TGT_DIR
-
-comp_and_link src/main.c       $TGT_DIR/main.o
-comp_and_link src/wav.c        $TGT_DIR/wav.o
-comp_and_link src/biquad.c     $TGT_DIR/biquad.o
-link_finish $TGT_DIR/sndfilter
+clang                       \
+	-o $TGT_DIR/sndfilter   \
+	-fwrapv                 \
+	-Werror                 \
+	$SRC_DIR/main.c         \
+	$SRC_DIR/wav.c          \
+	$SRC_DIR/biquad.c       \
+	$SRC_DIR/compressor.c

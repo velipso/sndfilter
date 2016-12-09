@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<title>Compressor Curve</title>
+	<style>
+body {
+	background-color: #eef;
+	font-family: sans-serif;
+}
+input {
+	font-size: inherit;
+}
+td.hint {
+	padding-left: 1em;
+	color: rgba(0, 0, 0, 0.5);
+	font-style: italic;
+}
+canvas {
+	width: 450px;
+	height: 450px;
+	float: left;
+}
+table {
+	float: left;
+	margin: 2em;
+	width: 500px;
+}
+input[readonly]{
+	background-color: #eee;
+	color: #666;
+}
+	</style>
+</head>
+<body>
+	<canvas id="cnv" width="900" height="900"></canvas>
+	<table>
+		<tbody>
+			<tr>
+				<td>Threshold:</td>
+				<td><input type="text" id="threshold" value="-24" /> dB</td>
+				<td class="hint">-100 to 0</td>
+			</tr>
+			<tr>
+				<td>Knee:</td>
+				<td><input type="text" id="knee" value="30" /> dB</td>
+				<td class="hint">0 to 40</td>
+			</tr>
+			<tr>
+				<td>Ratio:</td>
+				<td><input type="text" id="ratio" value="12" /></td>
+				<td class="hint">1 to 20</td>
+			</tr>
+			<tr>
+				<td>K:</td>
+				<td><input type="text" id="k" value="" readonly="readonly" /></td>
+				<td class="hint">Auto-calculated</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<p>
+						Hard-clipping happens at output 0 dB due to the physical maximum of audio
+						hardware.  For more information on how dB works, see
+						<a href="https://www.image-line.com/support/FLHelp/html/mixer_dB.htm">the dB
+							metering scale</a> from Image-Line.
+					</p>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<script>
+
+var cnv = document.getElementById('cnv');
+var ctx = cnv.getContext('2d');
+
+function displayk(k){
+	var d = document.getElementById('k');
+	if (k === false)
+		d.value = 'N/A';
+	else
+		d.value = '' + k;
+}
+
+function db2lin(db){
+	return Math.pow(10, db * 0.05);
+}
+
+function lin2db(lin){
+	return 20 * Math.log(lin) / Math.LN10;
+}
+
+//
+// create a curve function given a threshold, knee, and ratio
+//
+function makecurve(threshold, knee, ratio){
+	var slope = 1 / ratio; // desired slope after threshold+knee
+
+	if (knee <= 0){
+		displayk(false); // for UI
+		// if there is no knee, then this is a lot easier
+		return function(db){
+			// this is a 2-part curve
+
+			// before the threshold, the output is equal to the input
+			if (db < threshold)
+				return db;
+
+			// after the threshold, we use the desired slope
+			return threshold + slope * (db - threshold);
+		};
+	}
+
+	// otherwise, we have a knee, so we need to do a bit of calculation
+	// the knee curve is dialed into the correct shape using the `k` value
+	// our goal is that the slope of the knee curve should match the desired slope at the exact
+	// point where it transitions from the knee to the downward compression defined by ratio
+
+	var linearthreshold = db2lin(threshold);
+	var k = 5; // initial guess
+
+	function kneecurve(x){
+		return linearthreshold + (1 - Math.exp(-k * (x - linearthreshold))) / k;
+	}
+
+	// this function is courtesy of http://www.derivative-calculator.net/
+	// it is the derivative of lin2db(kneecurve(db2lin(x))), simplified a bit and made linear
+	function kneeslope(x){
+		return k * x / ((k * linearthreshold + 1) * Math.exp(k * (x - linearthreshold)) - 1);
+	}
+
+	// so how do we calculate the right k value, given a ratio? we do that by simply searching for
+	// a k value that gives us the right slope at the end of the knee
+	var xknee = db2lin(threshold + knee);
+	var mink = 0.1;
+	var maxk = 10000;
+	for (var i = 0; i < 15; i++){
+		if (kneeslope(xknee, k) < slope)
+			maxk = k;
+		else
+			mink = k;
+		k = Math.sqrt(mink * maxk); // recalculate the estimated k using the geometric mean
+	}
+
+	displayk(k); // for UI
+
+	// now that we have the right k, we should cache the knee dB offset
+	var kneedboffset = lin2db(kneecurve(xknee));
+
+	// the curve function receives an input in dB, and outputs in dB
+	return function(db){
+		// this is a 3-part curve
+
+		// before the threshold, the output is equal to the input
+		if (db < threshold)
+			return db;
+
+		// around the bend of the knee, we use the knee curve
+		if (db < threshold + knee)
+			return lin2db(kneecurve(db2lin(db)));
+
+		// after the knee, we use the desired slope
+		return kneedboffset + slope * (db - threshold - knee);
+	};
+}
+
+// this just draws the graph using the generated curve function for a given set of params
+function redraw(){
+	var threshold = parseFloat(document.getElementById('threshold').value);
+	var knee = parseFloat(document.getElementById('knee').value);
+	var ratio = parseFloat(document.getElementById('ratio').value);
+
+	if (isNaN(threshold) || isNaN(knee) || isNaN(ratio))
+		return;
+
+	var curve = makecurve(threshold, knee, ratio);
+
+	var graphsquare = cnv.height - 100;
+	var graphpos = [cnv.width - graphsquare, graphsquare];
+	var graphsize = [cnv.width - graphpos[0] - 30, -graphpos[1] + 30];
+
+	ctx.clearRect(0, 0, cnv.width, cnv.height);
+	ctx.font = '24px sans-serif';
+	ctx.fillStyle = '#000';
+
+	function mapdb(v){
+		return v * 200 - 100;
+	}
+
+	function unmapdb(v){
+		return (v + 100) / 200;
+	}
+
+	ctx.textAlign = 'center';
+	ctx.textBaseline = 'middle';
+	var maxstep = 11;
+	ctx.beginPath();
+	for (var x = 0; x < maxstep; x++){
+		var v = x / (maxstep - 1);
+		var db = mapdb(v);
+		var lbl = Math.round(db * 100) / 100;
+		var sx = graphpos[0] + v * graphsize[0];
+		ctx.fillText(lbl, sx, cnv.height - 60);
+		ctx.moveTo(sx, cnv.height - 90);
+		ctx.lineTo(sx, graphpos[1] + graphsize[1]);
+	}
+	ctx.strokeStyle = '#777';
+	ctx.stroke();
+	ctx.fillText('Input Level (dB)', graphpos[0] + 0.5 * graphsize[0], cnv.height - 20);
+
+	ctx.textAlign = 'right';
+	ctx.beginPath();
+	for (var y = 0; y < maxstep; y++){
+		var v = y / (maxstep - 1);
+		var db = mapdb(v);
+		var lbl = Math.round(db * 100) / 100;
+		var sy = graphpos[1] + v * graphsize[1];
+		ctx.fillText(lbl, graphpos[0] - 15, sy);
+		ctx.moveTo(graphpos[0] - 10, sy);
+		ctx.lineTo(graphpos[0] + graphsize[0], sy);
+	}
+	ctx.moveTo(graphpos[0], graphpos[1]);
+	ctx.lineTo(graphpos[0] + graphsize[0], graphpos[1] + graphsize[1]);
+	ctx.stroke();
+
+	ctx.save();
+	ctx.textAlign = 'center';
+	ctx.translate(20, graphpos[1] + graphsize[1] * 0.5);
+	ctx.rotate(-Math.PI * 0.5);
+	ctx.fillText('Output Level (dB)', 0, 0);
+	ctx.restore();
+
+	ctx.save();
+	ctx.beginPath();
+	var pad = 2;
+	ctx.rect(graphpos[0] - pad, graphpos[1] + graphsize[1] - pad,
+		graphsize[0] + pad * 2, -graphsize[1] + pad * 2);
+	ctx.clip();
+	ctx.beginPath();
+	maxstep = 200;
+	for (var x = 0; x < maxstep; x++){
+		var vx = x / (maxstep - 1);
+		var xdb = mapdb(vx);
+		var ydb = curve(xdb);
+		var vy = unmapdb(ydb);
+		var sx = graphpos[0] + vx * graphsize[0];
+		var sy = graphpos[1] + vy * graphsize[1];
+		if (x == 0)
+			ctx.moveTo(sx, sy);
+		else
+			ctx.lineTo(sx, sy);
+	}
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = '#000';
+	ctx.stroke();
+	ctx.restore();
+}
+
+window.onload = redraw;
+
+(['threshold', 'knee', 'ratio']).forEach(function(id){
+	document.getElementById(id).addEventListener('input', redraw);
+});
+	</script>
+</body>
+</html>

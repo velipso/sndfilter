@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<title>Adaptive Release Curve</title>
+	<style>
+body {
+	background-color: #efe;
+	font-family: sans-serif;
+}
+input {
+	font-size: inherit;
+}
+canvas {
+	width: 450px;
+	height: 450px;
+	border: 1px solid #555;
+	float: left;
+	margin-top: 1em;
+}
+table {
+	margin: 1em;
+	float: left;
+	width: 500px;
+}
+input[readonly]{
+	background-color: #eee;
+	color: #666;
+}
+	</style>
+</head>
+<body>
+	<canvas id="cnv" width="900" height="900"></canvas>
+	<table>
+		<tbody>
+			<tr>
+				<td>Release Zone 1:</td>
+				<td><input type="text" id="r1" value="0.09" readonly="readonly" /></td>
+			</tr>
+			<tr>
+				<td>Release Zone 2:</td>
+				<td><input type="text" id="r2" value="0.16" readonly="readonly" /></td>
+			</tr>
+			<tr>
+				<td>Release Zone 3:</td>
+				<td><input type="text" id="r3" value="0.42" readonly="readonly" /></td>
+			</tr>
+			<tr>
+				<td>Release Zone 4:</td>
+				<td><input type="text" id="r4" value="0.98" readonly="readonly" /></td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<p>
+						X-axis is the amount of desired dB change (clamped from -12 to 0).
+					</p>
+					<p>
+						Y-axis is release time as a fraction of the total release time.
+					</p>
+					<p>
+						The intention of adaptive release is to mimic the dynamic response of the
+						human ear.
+					</p>
+					<p>
+						If the input signal exceeds the threshold in short bursts, then the release
+						should be quick.  This is accomplished on the left side of the graph -- the
+						desired dB change will be large, so the fraction of the release time should
+						be small.
+					</p>
+					<p>
+						If the threshold is exceeded over a longer period, then the release should
+						be slower.  This is on the right side of the graph -- the desired dB change
+						will be small, so the fraction of the release time should be close to the
+						entire release time.
+					</p>
+					<p>
+						Drag the nodes in the graph to modify the release zone values.
+					</p>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<script>
+
+var cnv = document.getElementById('cnv');
+var ctx = cnv.getContext('2d');
+
+var samplerate = 48000;
+var releasetime = 0.25;
+
+var releasezone1 = 0.09;
+var releasezone2 = 0.16;
+var releasezone3 = 0.42;
+var releasezone4 = 0.98;
+
+function redraw(){
+	function set(e, v){
+		document.getElementById(e).value = '' + v;
+	}
+	set('r1', releasezone1);
+	set('r2', releasezone2);
+	set('r3', releasezone3);
+	set('r4', releasezone4);
+	ctx.clearRect(0, 0, cnv.width, cnv.height);
+
+	//
+	// this is the definition of the curve
+	//
+	var releasesamples = samplerate * releasetime;
+
+	var y1 = releasesamples * releasezone1;
+	var y2 = releasesamples * releasezone2;
+	var y3 = releasesamples * releasezone3;
+	var y4 = releasesamples * releasezone4;
+
+	var a = (-y1 + 3 * y2 - 3 * y3 + y4) / 6;
+	var b = y1 - 2.5 * y2 + 2 * y3 - 0.5 * y4;
+	var c = (-11 * y1 + 18 * y2 - 9 * y3 + 2 * y4) / 6;
+	var d = y1;
+
+	function f(x){
+		// a*x^3 + b*x^2 + c*x + d
+		return a * x * x * x + b * x * x + c * x + d;
+	}
+	//
+	// ---
+	//
+
+	var steps = 100;
+	var xrange = [0, 3];
+	var yrange = [0, samplerate * releasetime];
+
+	function map(x, y){
+		var vx = (x - xrange[0]) / (xrange[1] - xrange[0]);
+		var vy = (y - yrange[0]) / (yrange[1] - yrange[0]);
+		return [
+			vx * (cnv.width - 1),
+			cnv.height - vy * (cnv.height - 1)
+		];
+	}
+
+	ctx.beginPath();
+	ctx.moveTo(cnv.width / 3, 0);
+	ctx.lineTo(cnv.width / 3, cnv.height);
+	ctx.moveTo(cnv.width * 2 / 3, 0);
+	ctx.lineTo(cnv.width * 2 / 3, cnv.height);
+	ctx.strokeStyle = '#555';
+	ctx.lineWidth = 2;
+	ctx.stroke();
+
+	ctx.font = '24px sans-serif';
+	ctx.fillStyle = '#555';
+	for (var i = 0; i < 10; i++){
+		var y = cnv.height - i * cnv.height / 10;
+		ctx.beginPath();
+		ctx.moveTo(0, y);
+		ctx.lineTo(cnv.width, y);
+		ctx.strokeStyle = '#ccc';
+		ctx.stroke();
+		ctx.fillText(i / 10, 10, y - 4);
+	}
+
+	ctx.beginPath();
+	for (var i = 0; i < steps; i++){
+		var x = i * 3 / (steps - 1);
+		var y = f(x);
+		var s = map(x, y);
+		if (i == 0)
+			ctx.moveTo(s[0], s[1]);
+		else
+			ctx.lineTo(s[0], s[1]);
+	}
+	ctx.strokeStyle = '#000';
+	ctx.lineWidth = 4;
+	ctx.stroke();
+
+	ctx.lineWidth = 1;
+	([[0, y1], [1, y2], [2, y3], [3, y4]]).forEach(function(pt){
+		var s = map(pt[0], pt[1]);
+		ctx.beginPath();
+		ctx.arc(s[0], s[1], 10, 0, Math.PI * 2);
+		ctx.fillStyle = '#f00';
+		ctx.fill();
+		ctx.strokeStyle = '#000';
+		ctx.stroke();
+	});
+}
+
+cnv.addEventListener('mousedown', function(e){
+	function move(e){
+		var x = e.offsetX * 2;
+		var y = e.offsetY * 2;
+		y = 1 - y / cnv.height;
+		y = Math.round(y * 100) / 100;
+		x = Math.floor(x * 6 / cnv.width);
+		if (x == 0)
+			releasezone1 = y;
+		else if (x == 1 || x == 2)
+			releasezone2 = y;
+		else if (x == 3 || x == 4)
+			releasezone3 = y;
+		else
+			releasezone4 = y;
+		redraw();
+	}
+	move(e);
+	function mup(e){
+		cnv.removeEventListener('mousemove', move);
+		cnv.removeEventListener('mouseup', mup);
+		cnv.removeEventListener('mouseout', mup);
+	}
+	cnv.addEventListener('mousemove', move);
+	cnv.addEventListener('mouseup', mup);
+	cnv.addEventListener('mouseout', mup);
+});
+
+window.onload = redraw;
+
+	</script>
+</body>
+</html>
