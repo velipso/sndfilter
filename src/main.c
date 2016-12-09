@@ -150,10 +150,6 @@ static int filter3(const char *input, const char *output,
 }
 
 int main(int argc, char **argv){
-
-	sf_compressor(NULL, sf_compressor_defaults);
-	return 0;
-
 	if (argc <= 4)
 		return printhelp();
 
