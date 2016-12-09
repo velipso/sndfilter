@@ -21,6 +21,7 @@ Simply run `./build` and the executable should be `./tgt/sndfilter`.
 Filters
 -------
 
+* [Compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression)
 * [Low-Pass](https://en.wikipedia.org/wiki/Low-pass_filter) (Cutoff, Resonance)
 * [High-Pass](https://en.wikipedia.org/wiki/High-pass_filter) (Cutoff, Resonance)
 * [Band-Pass](https://en.wikipedia.org/wiki/Band-pass_filter) (Frequency, Q)
@@ -29,13 +30,12 @@ Filters
 * [All-Pass](https://en.wikipedia.org/wiki/All-pass_filter) (Frequency, Q)
 * [Low Shelf](http://www.audiorecording.me/what-is-a-low-shelf-and-high-shelf-filter-in-parametric-equalization.html) (Frequency, Q, Gain)
 * [High Shelf](http://www.audiorecording.me/what-is-a-low-shelf-and-high-shelf-filter-in-parametric-equalization.html) (Frequency, Q, Gain)
-* [Compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression)
 
 Implementation
 --------------
 
-The [biquad.c](https://github.com/voidqk/sndfilter/blob/master/src/biquad.c) and
-[compressor.c](https://github.com/voidqk/sndfilter/blob/master/src/compressor.c) are the core
+The [compressor.c](https://github.com/voidqk/sndfilter/blob/master/src/compressor.c) and
+[biquad.c](https://github.com/voidqk/sndfilter/blob/master/src/biquad.c) are the core
 algorithms.
 
 I do not understand the biquad math, so please don't ask me any questions :-).  The core formulas
