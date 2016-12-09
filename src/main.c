@@ -79,12 +79,12 @@ static int printhelp(){
 		"      gain       Amount of gain of the shelf (dB)\n"
 		"\n"
 		"    compressor <pregain> <threshold> <knee> <ratio> <attack> <release>\n"
-		"      pregain    Decibel amount to perform gain before compression (0 - 40)\n"
+		"      pregain    Decibel amount to perform gain before compression (0 to 40)\n"
 		"      threshold  Decibel level that triggers the compression (-100 to 0)\n"
-		"      knee       Decibel width of the knee (0 - 40)\n"
-		"      ratio      Ratio of compression after the threshold (1 - 20)\n"
-		"      attack     Seconds for the compression to kick in (0 - 1)\n"
-		"      release    Seconds for the compression to release (0 - 1)\n");
+		"      knee       Decibel width of the knee (0 to 40)\n"
+		"      ratio      Ratio of compression after the threshold (1 to 20)\n"
+		"      attack     Seconds for the compression to kick in (0 to 1)\n"
+		"      release    Seconds for the compression to release (0 to 1)\n");
 	return 0;
 }
 
