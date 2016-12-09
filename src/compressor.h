@@ -11,6 +11,7 @@
 #include "types.h"
 
 typedef struct {
+	float pregain;
 	float threshold;
 	float knee;
 	float ratio;

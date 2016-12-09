@@ -8,9 +8,13 @@
 
 // core algorithm extracted from Chromium source, DynamicsCompressorKernel.cpp, here:
 //   https://git.io/v1uSK
+//
+// changed a few things though in an attempt to simplify the curves and algorithm, and also included
+// a pregain so that samples can be scaled up then compressed
 
 // sane defaults
 const sf_compressor_params_st sf_compressor_defaults = (sf_compressor_params_st){
+	.pregain      =   0.000f,  // dB
 	.threshold    = -24.000f,  // [-100, 0] dB
 	.knee         =  30.000f,  // [0, 40]   dB
 	.ratio        =  12.000f,  // [1, 20]   unit less
@@ -18,7 +22,7 @@ const sf_compressor_params_st sf_compressor_defaults = (sf_compressor_params_st)
 	.release      =   0.250f,  // [0, 1]    seconds
 	.predelay     =   0.006f,  // seconds
 	.releasezone1 =   0.090f,  // release zones range from 0 to 1, increasing
-	.releasezone2 =   0.160f,  //
+	.releasezone2 =   0.160f,  //  (see adaptive-release-curve.html)
 	.releasezone3 =   0.420f,  //
 	.releasezone4 =   0.980f,  //
 	.postgain     =   0.000f,  // dB
@@ -70,6 +74,13 @@ static inline float absf(float v){
 	return v < 0.0f ? -v : v;
 }
 
+static inline float fixf(float v, float def){
+	// fix NaN and infinity values that sneak in... not sure why this is needed, but it is
+	if (isnan(v) || isinf(v))
+		return def;
+	return v;
+}
+
 static inline void meterout(float gaindb){
 	// this function doesn't do anything, but if you want to have a meter that is displayed showing
 	// the full effect of the compressor, you would plug in here
@@ -78,12 +89,16 @@ static inline void meterout(float gaindb){
 }
 
 sf_snd sf_compressor(sf_snd snd, sf_compressor_params_st params){
-	// setup the predelay buffer and output sound
+	// setup the predelay buffer
 	int delaybufsize = snd->rate * params.predelay;
+	if (delaybufsize < 2) // at least one sample delay
+		delaybufsize = 2;
 	sf_sample_st *delaybuf = malloc(sizeof(sf_sample_st) * delaybufsize);
 	if (delaybuf == NULL)
 		return NULL;
 	memset(delaybuf, 0, sizeof(sf_sample_st) * delaybufsize);
+
+	// setup the output sound
 	sf_snd out = sf_snd_new();
 	if (out == NULL){
 		free(delaybuf);
@@ -91,7 +106,9 @@ sf_snd sf_compressor(sf_snd snd, sf_compressor_params_st params){
 	}
 	int samplesperchunk = 32; // process everything in chunks of 32 samples at a time
 	int chunks = snd->size / samplesperchunk;
-	out->samples = malloc(sizeof(sf_sample_st) * chunks * samplesperchunk);
+	out->size = chunks * samplesperchunk;
+	out->rate = snd->rate;
+	out->samples = malloc(sizeof(sf_sample_st) * out->size);
 	if (out->samples == NULL){
 		sf_snd_free(out);
 		free(delaybuf);
@@ -99,6 +116,7 @@ sf_snd sf_compressor(sf_snd snd, sf_compressor_params_st params){
 	}
 
 	// useful values
+	float linearpregain = db2lin(params.pregain);
 	float linearthreshold = db2lin(params.threshold);
 	float slope = 1.0f / params.ratio;
 	float attacksamples = (float)snd->rate * params.attack;
@@ -109,12 +127,12 @@ sf_snd sf_compressor(sf_snd snd, sf_compressor_params_st params){
 	float dry = 1.0f - params.wet;
 
 	// metering values (not used in core algorithm, but used to output a meter if desired)
-	float metergain = 1.0f;
+	float metergain = 1.0f; // gets overwritten immediately because gain will always be negative
 	float meterfalloff = 0.325f; // seconds
 	float meterrelease = 1.0f - expf(-1.0f / ((float)snd->rate * meterfalloff));
 
 	// calculate knee curve parameters
-	float k = 5;
+	float k = 5; // initial guess
 	float kneedboffset;
 	float linearthresholdknee;
 	if (params.knee > 0.0f){ // if a knee exists, search for a good k value
@@ -140,7 +158,7 @@ sf_snd sf_compressor(sf_snd snd, sf_compressor_params_st params){
 
 	// calculate the adaptive release curve parameters
 	// solve a,b,c,d in `y = a*x^3 + b*x^2 + c*x + d`
-	// using known points (x, y) to (0, y1), (1, y2), (2, y3), (3, y4)
+	// interescting points (0, y1), (1, y2), (2, y3), (3, y4)
 	float y1 = releasesamples * params.releasezone1;
 	float y2 = releasesamples * params.releasezone2;
 	float y3 = releasesamples * params.releasezone3;
@@ -161,6 +179,7 @@ sf_snd sf_compressor(sf_snd snd, sf_compressor_params_st params){
 	float maxcompdiffdb = -1;
 	float spacingdb = 5.0f;
 	for (int ch = 0; ch < chunks; ch++){
+		detectoravg = fixf(detectoravg, 1.0f);
 		float desiredgain = detectoravg;
 		float scaleddesiredgain = asinf(desiredgain) * ang90inv;
 		float compdiffdb = lin2db(compgain / scaleddesiredgain);
@@ -168,6 +187,7 @@ sf_snd sf_compressor(sf_snd snd, sf_compressor_params_st params){
 		// calculate envelope rate based on whether we're attacking or releasing
 		float enveloperate;
 		if (compdiffdb < 0.0f){ // compgain < scaleddesiredgain, so we're releasing
+			compdiffdb = fixf(compdiffdb, -1.0f);
 			maxcompdiffdb = -1; // reset for a future attack mode
 			// apply the adaptive release curve
 			// scale compdiffdb between 0-3
@@ -176,6 +196,7 @@ sf_snd sf_compressor(sf_snd snd, sf_compressor_params_st params){
 			enveloperate = db2lin(spacingdb / releasesamples);
 		}
 		else{ // compresorgain > scaleddesiredgain, so we're attacking
+			compdiffdb = fixf(compdiffdb, 1.0f);
 			if (maxcompdiffdb == -1 || maxcompdiffdb < compdiffdb)
 				maxcompdiffdb = compdiffdb;
 			float attenuate = maxcompdiffdb;
@@ -189,9 +210,12 @@ sf_snd sf_compressor(sf_snd snd, sf_compressor_params_st params){
 			delayreadpos = (delayreadpos + 1) % delaybufsize,
 			delaywritepos = (delaywritepos + 1) % delaybufsize){
 
-			delaybuf[delaywritepos] = snd->samples[samplepos];
-			float inputL = absf(snd->samples[samplepos].L);
-			float inputR = absf(snd->samples[samplepos].R);
+			float inputL = snd->samples[samplepos].L * linearpregain;
+			float inputR = snd->samples[samplepos].R * linearpregain;
+			delaybuf[delaywritepos] = (sf_sample_st){ .L = inputL, .R = inputR };
+
+			inputL = absf(inputL);
+			inputR = absf(inputR);
 			float inputmax = inputL > inputR ? inputL : inputR;
 
 			float attenuation;
@@ -217,6 +241,7 @@ sf_snd sf_compressor(sf_snd snd, sf_compressor_params_st params){
 			detectoravg += (attenuation - detectoravg) * rate;
 			if (detectoravg > 1.0f)
 				detectoravg = 1.0f;
+			detectoravg = fixf(detectoravg, 1.0f);
 
 			if (enveloperate < 1) // attack, reduce gain
 				compgain += (scaleddesiredgain - compgain) * enveloperate;

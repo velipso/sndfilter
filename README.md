@@ -1,3 +1,4 @@
+
 sndfilter
 =========
 
@@ -28,14 +29,22 @@ Filters
 * [All-Pass](https://en.wikipedia.org/wiki/All-pass_filter) (Frequency, Q)
 * [Low Shelf](http://www.audiorecording.me/what-is-a-low-shelf-and-high-shelf-filter-in-parametric-equalization.html) (Frequency, Q, Gain)
 * [High Shelf](http://www.audiorecording.me/what-is-a-low-shelf-and-high-shelf-filter-in-parametric-equalization.html) (Frequency, Q, Gain)
+* [Compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression)
 
 Implementation
 --------------
 
-The [biquad.c](https://github.com/voidqk/sndfilter/blob/master/src/biquad.c) file is the meat of the
-processing.  There are some comments in that file that describe what is happening.
+The [biquad.c](https://github.com/voidqk/sndfilter/blob/master/src/biquad.c) and
+[compressor.c](https://github.com/voidqk/sndfilter/blob/master/src/compressor.c) are the core
+algorithms.
 
-I do not understand the math, so please don't ask me any questions :-).  The core formulas were
-extracted from the [Chromium](https://github.com/nwjs/chromium.src) source code (specifically
-[Biquad.cpp](https://github.com/nwjs/chromium.src/blob/df7f8c8582b9a78c806a7fa1e9d3f3ba51f7a698/third_party/WebKit/Source/platform/audio/Biquad.cpp)),
-and cleaned up to make it easier to read.
+I do not understand the biquad math, so please don't ask me any questions :-).  The core formulas
+were extracted from
+[Biquad.cpp](https://github.com/nwjs/chromium.src/blob/df7f8c8582b9a78c806a7fa1e9d3f3ba51f7a698/third_party/WebKit/Source/platform/audio/Biquad.cpp)
+(Chromium source), and cleaned up a bit to make easier to read.
+
+The compressor came from
+[DynamicsCompressorKernel.cpp](https://github.com/nwjs/chromium.src/blob/df7f8c8582b9a78c806a7fa1e9d3f3ba51f7a698/third_party/WebKit/Source/platform/audio/DynamicsCompressorKernel.cpp)
+(also from Chromium), and cleaned up a bit more.  I swaped out the adaptive release curve and
+simplified the knee calculations.  I feel a little more comfortable with that algorithm because
+there isn't a whole lot of magical math involved.

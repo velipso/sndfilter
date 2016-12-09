@@ -254,11 +254,12 @@ function redraw(){
 	ctx.restore();
 }
 
-window.onload = redraw;
-
 (['threshold', 'knee', 'ratio']).forEach(function(id){
 	document.getElementById(id).addEventListener('input', redraw);
 });
+
+setTimeout(redraw, 100);
+
 	</script>
 </body>
 </html>
