@@ -1,20 +1,27 @@
 #!/bin/bash
 
+# abort this script on any error
 set -e
 
+# goofy way to get the directory the script is in
 pushd "$(dirname "$0")" > /dev/null
 SCRIPT_DIR="$(pwd)"
 popd > /dev/null
-SRC_DIR=$SCRIPT_DIR/src
-TGT_DIR=$SCRIPT_DIR/tgt
 
-mkdir -p $TGT_DIR
+SRC_DIR="$SCRIPT_DIR/src"
+TGT_DIR="$SCRIPT_DIR/tgt"
 
-clang                       \
-	-o $TGT_DIR/sndfilter   \
-	-fwrapv                 \
-	-Werror                 \
-	$SRC_DIR/main.c         \
-	$SRC_DIR/wav.c          \
-	$SRC_DIR/biquad.c       \
-	$SRC_DIR/compressor.c
+# create the target directory
+mkdir -p "$TGT_DIR"
+
+# compile the source files
+# -fwrapv   integers should wrap around like normal
+# -Werror   elevate warnings to errors
+clang                         \
+    -o "$TGT_DIR/sndfilter"   \
+    -fwrapv                   \
+    -Werror                   \
+    "$SRC_DIR/main.c"         \
+    "$SRC_DIR/wav.c"          \
+    "$SRC_DIR/biquad.c"       \
+    "$SRC_DIR/compressor.c"
