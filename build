@@ -8,6 +8,8 @@ popd > /dev/null
 SRC_DIR=$SCRIPT_DIR/src
 TGT_DIR=$SCRIPT_DIR/tgt
 
+mkdir -p $TGT_DIR
+
 clang                       \
 	-o $TGT_DIR/sndfilter   \
 	-fwrapv                 \
