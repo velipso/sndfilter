@@ -249,9 +249,7 @@ void sf_lowshelf(sf_biquad_state_st *state, int rate, float freq, float Q, float
 	float nyquist = rate * 0.5f;
 	freq /= nyquist;
 
-	// TODO: figure out what happens when Q <= 0 or Q >= 1
-
-	if (freq <= 0.0f){
+	if (freq <= 0.0f || Q == 0.0f){
 		state_passthrough(state);
 		return;
 	}
@@ -264,7 +262,10 @@ void sf_lowshelf(sf_biquad_state_st *state, int rate, float freq, float Q, float
 	}
 
 	float w0    = (float)M_PI * 2.0f * freq;
-	float alpha = 0.5f * sinf(w0) * sqrtf((A + 1.0f / A) * (1.0f / Q - 1.0f) + 2.0f);
+	float ainn  = (A + 1.0f / A) * (1.0f / Q - 1.0f) + 2.0f;
+	if (ainn < 0)
+		ainn = 0;
+	float alpha = 0.5f * sinf(w0) * sqrtf(ainn);
 	float k     = cosf(w0);
 	float k2    = 2.0f * sqrtf(A) * alpha;
 	float Ap1   = A + 1.0f;
@@ -283,9 +284,7 @@ void sf_highshelf(sf_biquad_state_st *state, int rate, float freq, float Q, floa
 	float nyquist = rate * 0.5f;
 	freq /= nyquist;
 
-	// TODO: figure out what happens when Q <= 0 or Q >= 1
-
-	if (freq >= 1.0f){
+	if (freq >= 1.0f || Q == 0.0f){
 		state_passthrough(state);
 		return;
 	}
@@ -298,7 +297,10 @@ void sf_highshelf(sf_biquad_state_st *state, int rate, float freq, float Q, floa
 	}
 
 	float w0    = (float)M_PI * 2.0f * freq;
-	float alpha = 0.5f * sinf(w0) * sqrtf((A + 1.0f / A) * (1.0f / Q - 1.0f) + 2.0f);
+	float ainn  = (A + 1.0f / A) * (1.0f / Q - 1.0f) + 2.0f;
+	if (ainn < 0)
+		ainn = 0;
+	float alpha = 0.5f * sinf(w0) * sqrtf(ainn);
 	float k     = cosf(w0);
 	float k2    = 2.0f * sqrtf(A) * alpha;
 	float Ap1   = A + 1.0f;

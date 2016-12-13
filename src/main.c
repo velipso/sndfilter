@@ -148,7 +148,7 @@ static inline int compressor(sf_snd input_snd, sf_compressor_state_st *state, co
 	}
 	return 0;
 }
-#include <math.h>
+
 int main(int argc, char **argv){
 	if (argc < 4)
 		return printhelp();
