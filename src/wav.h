@@ -3,12 +3,13 @@
 // Project Home: https://github.com/voidqk/sndfilter
 
 // simple .wav file loading and saving
+// only handles loading 1 or 2 channel WAVs with 16-bit samples
+// only saves 2 channel WAVs with 16-bit samples
 
 #ifndef SNDFILTER_WAV__H
 #define SNDFILTER_WAV__H
 
-#include "types.h"
-#include <stdbool.h>
+#include "snd.h"
 
 sf_snd sf_wavload(const char *file);
 bool   sf_wavsave(sf_snd snd, const char *file);

@@ -22,6 +22,8 @@ clang                         \
     -fwrapv                   \
     -Werror                   \
     "$SRC_DIR/main.c"         \
+    "$SRC_DIR/mem.c"          \
+    "$SRC_DIR/snd.c"          \
     "$SRC_DIR/wav.c"          \
     "$SRC_DIR/biquad.c"       \
     "$SRC_DIR/compressor.c"
