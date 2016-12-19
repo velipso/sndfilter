@@ -174,7 +174,7 @@ typedef struct {
 // modulated all-pass filter
 // maximum size and maximum mod size
 #define SF_REVERB_APMS      8681
-#define SF_REVERB_APMM      61
+#define SF_REVERB_APMM      137
 typedef struct {
 	int rpos, wpos;
 	int size, msize;

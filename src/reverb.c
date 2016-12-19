@@ -13,10 +13,6 @@ static inline float db2lin(float db){ // dB to linear
 	return powf(10.0f, 0.05f * db);
 }
 
-static inline float lin2db(float lin){ // linear to dB
-	return 20.0f * log10f(lin);
-}
-
 static inline int clampi(int v, int min, int max){
 	return v < min ? min : (v > max ? max : v);
 }
@@ -571,84 +567,60 @@ static inline float comb_step(sf_rv_comb_st *comb, float v, float feedback){
 // now that all the components are done (thank god), we can start on the actual reverb effect
 
 void sf_presetreverb(sf_reverb_state_st *rv, int rate, sf_reverb_preset preset){
+	// sorry for the bad formatting, I've tried to cram this in as best as I could
+	struct {
+		int osf; float p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16;
+	} ps[] = {
+
+//OSF ERtoLt ERefWet Dry ERefFc ERefWi Wdth Wet Wander BassB  Spin InpLP BassLP DampLP OutputLP RT60   Delay
+{1, 0.40f,  -9.0f, -10, 1.60f,  0.7f, 1.0f, -0, 0.27f, 0.15f, 0.7f, 17000,  500,  7000, 10000,  3.2f, 0.020f},
+{2, 0.30f,  -9.0f,  -8, 1.00f,  0.7f, 1.0f, -8, 0.32f, 0.25f, 0.7f, 18000,  600,  9000, 17000,  2.1f, 0.010f},
+{1, 0.30f,  -9.0f,  -8, 1.00f,  0.7f, 1.0f, -8, 0.27f, 0.20f, 0.5f, 18000,  600,  7000,  9000,  2.3f, 0.010f},
+{2, 0.30f,  -9.0f,  -8, 1.20f,  0.7f, 1.0f, -8, 0.27f, 0.20f, 0.7f, 18000,  500,  8000, 16000,  2.8f, 0.010f},
+{1, 0.30f,  -9.0f,  -8, 1.20f,  0.7f, 1.0f, -8, 0.25f, 0.15f, 0.5f, 18000,  500,  6000,  8000,  2.9f, 0.010f},
+{2, 0.20f,  -9.0f,  -8, 1.40f,  0.7f, 1.0f, -8, 0.17f, 0.20f, 1.0f, 18000,  400,  9000, 14000,  3.8f, 0.018f},
+{2, 0.20f,  -9.0f,  -8, 1.50f,  0.7f, 1.0f, -8, 0.20f, 0.20f, 0.5f, 18000,  400,  5000,  7000,  4.2f, 0.018f},
+{2, 0.70f,  -8.0f,  -8, 0.70f, -0.4f, 0.8f, -8, 0.20f, 0.30f, 1.6f, 18000, 1000, 18000, 18000,  0.5f, 0.005f},
+{3, 0.70f,  -8.0f,  -8, 0.80f,  0.6f, 0.9f, -8, 0.30f, 0.30f, 0.4f, 18000,  300, 10000, 18000,  0.5f, 0.005f},
+{2, 0.50f,  -8.0f,  -8, 1.20f, -0.4f, 0.8f, -8, 0.20f, 0.10f, 1.6f, 18000, 1000, 18000, 18000,  0.8f, 0.008f},
+{2, 0.50f,  -8.0f,  -8, 1.20f,  0.6f, 0.9f, -8, 0.30f, 0.10f, 0.4f, 18000,  300, 10000, 18000,  1.2f, 0.016f},
+{2, 0.20f,  -8.0f,  -8, 2.20f, -0.4f, 0.9f, -8, 0.20f, 0.10f, 1.6f, 18000, 1000, 16000, 18000,  1.8f, 0.010f},
+{2, 0.20f,  -8.0f,  -8, 2.20f,  0.6f, 0.9f, -8, 0.30f, 0.10f, 0.4f, 18000,  500,  9000, 18000,  1.9f, 0.020f},
+{2, 0.50f,  -7.0f,  -7, 1.20f, -0.4f, 0.8f,-70, 0.20f, 0.10f, 1.6f, 18000, 1000, 18000, 18000,  0.8f, 0.008f},
+{2, 0.50f,  -7.0f,  -7, 1.20f,  0.6f, 0.9f,-70, 0.30f, 0.10f, 0.4f, 18000,  300, 10000, 18000,  1.2f, 0.016f},
+{2, 0.00f, -70.0f, -20, 1.00f,  1.0f, 1.0f, -8, 0.20f, 0.10f, 1.6f, 18000, 1000, 16000, 18000,  1.8f, 0.000f},
+{2, 0.00f, -70.0f, -20, 1.00f,  1.0f, 1.0f, -8, 0.30f, 0.20f, 0.4f, 18000,  500,  9000, 18000,  1.9f, 0.000f},
+{2, 0.10f, -16.0f, -15, 1.00f,  0.1f, 1.0f, -5, 0.35f, 0.05f, 1.0f, 18000,  100, 10000, 18000, 12.0f, 0.000f},
+{2, 0.10f, -16.0f, -15, 1.00f,  0.1f, 1.0f, -5, 0.40f, 0.05f, 1.0f, 18000,  100,  9000, 18000, 30.0f, 0.000f}
+
+	};
+
+	#define CASE(prs, i)                                                                        \
+		case prs: sf_advancereverb(rv, rate, ps[i].osf, ps[i].p1, ps[i].p2, ps[i].p3, ps[i].p4, \
+			ps[i].p5, ps[i].p6, ps[i].p7, ps[i].p8, ps[i].p9, ps[i].p10, ps[i].p11, ps[i].p12,  \
+			ps[i].p13, ps[i].p14, ps[i].p15, ps[i].p16); return;
 	switch (preset){
-		case SF_REVERB_PRESET_DEFAULT:
-			sf_advancereverb(rv, rate, 1, 0.4f,  -9.0f, -10.0f, 1.6f,  0.7f, 1.0f,  -0.0f, 0.27f,
-				0.15f, 0.7f, 17000.0f,  500.0f,  7000.0f, 10000.0f,  3.2f, 0.020f);
-			return;
-		case SF_REVERB_PRESET_SMALLHALL1:
-			sf_advancereverb(rv, rate, 2, 0.3f,  -9.0f,  -8.0f, 1.0f,  0.7f, 1.0f,  -8.0f, 0.32f,
-				0.25f, 0.7f, 18000.0f,  600.0f,  9000.0f, 17000.0f,  2.1f, 0.010f);
-			return;
-		case SF_REVERB_PRESET_SMALLHALL2:
-			sf_advancereverb(rv, rate, 1, 0.3f,  -9.0f,  -8.0f, 1.0f,  0.7f, 1.0f,  -8.0f, 0.27f,
-				0.20f, 0.5f, 18000.0f,  600.0f,  7000.0f,  9000.0f,  2.3f, 0.010f);
-			return;
-		case SF_REVERB_PRESET_MEDIUMHALL1:
-			sf_advancereverb(rv, rate, 2, 0.3f,  -9.0f,  -8.0f, 1.2f,  0.7f, 1.0f,  -8.0f, 0.27f,
-				0.20f, 0.7f, 18000.0f,  500.0f,  8000.0f, 16000.0f,  2.8f, 0.010f);
-			return;
-		case SF_REVERB_PRESET_MEDIUMHALL2:
-			sf_advancereverb(rv, rate, 1, 0.3f,  -9.0f,  -8.0f, 1.2f,  0.7f, 1.0f,  -8.0f, 0.25f,
-				0.15f, 0.5f, 18000.0f,  500.0f,  6000.0f,  8000.0f,  2.9f, 0.010f);
-			return;
-		case SF_REVERB_PRESET_LARGEHALL1:
-			sf_advancereverb(rv, rate, 2, 0.2f,  -9.0f,  -8.0f, 1.4f,  0.7f, 1.0f,  -8.0f, 0.17f,
-				0.20f, 1.0f, 18000.0f,  400.0f,  9000.0f, 14000.0f,  3.8f, 0.018f);
-			return;
-		case SF_REVERB_PRESET_LARGEHALL2:
-			sf_advancereverb(rv, rate, 2, 0.2f,  -9.0f,  -8.0f, 1.5f,  0.7f, 1.0f,  -8.0f, 0.20f,
-				0.20f, 0.5f, 18000.0f,  400.0f,  5000.0f,  7000.0f,  4.2f, 0.018f);
-			return;
-		case SF_REVERB_PRESET_SMALLROOM1:
-			sf_advancereverb(rv, rate, 2, 0.7f,  -8.0f,  -8.0f, 0.7f, -0.4f, 0.8f,  -8.0f, 0.20f,
-				0.30f, 1.6f, 18000.0f, 1000.0f, 18000.0f, 18000.0f,  0.5f, 0.005f);
-			return;
-		case SF_REVERB_PRESET_SMALLROOM2:
-			sf_advancereverb(rv, rate, 3, 0.7f,  -8.0f,  -8.0f, 0.8f,  0.6f, 0.9f,  -8.0f, 0.30f,
-				0.30f, 0.4f, 18000.0f,  300.0f, 10000.0f, 18000.0f,  0.5f, 0.005f);
-			return;
-		case SF_REVERB_PRESET_MEDIUMROOM1:
-			sf_advancereverb(rv, rate, 2, 0.5f,  -8.0f,  -8.0f, 1.2f, -0.4f, 0.8f,  -8.0f, 0.20f,
-				0.10f, 1.6f, 18000.0f, 1000.0f, 18000.0f, 18000.0f,  0.8f, 0.008f);
-			return;
-		case SF_REVERB_PRESET_MEDIUMROOM2:
-			sf_advancereverb(rv, rate, 2, 0.5f,  -8.0f,  -8.0f, 1.2f,  0.6f, 0.9f,  -8.0f, 0.30f,
-				0.10f, 0.4f, 18000.0f,  300.0f, 10000.0f, 18000.0f,  1.2f, 0.016f);
-			return;
-		case SF_REVERB_PRESET_LARGEROOM1:
-			sf_advancereverb(rv, rate, 2, 0.2f,  -8.0f,  -8.0f, 2.2f, -0.4f, 0.9f,  -8.0f, 0.20f,
-				0.10f, 1.6f, 18000.0f, 1000.0f, 16000.0f, 18000.0f,  1.8f, 0.010f);
-			return;
-		case SF_REVERB_PRESET_LARGEROOM2:
-			sf_advancereverb(rv, rate, 2, 0.2f,  -8.0f,  -8.0f, 2.2f,  0.6f, 0.9f,  -8.0f, 0.30f,
-				0.10f, 0.4f, 18000.0f,  500.0f,  9000.0f, 18000.0f,  1.9f, 0.020f);
-			return;
-		case SF_REVERB_PRESET_MEDIUMER1:
-			sf_advancereverb(rv, rate, 2, 0.5f,  -7.0f,  -7.0f, 1.2f, -0.4f, 0.8f, -70.0f, 0.20f,
-				0.10f, 1.6f, 18000.0f, 1000.0f, 18000.0f, 18000.0f,  0.8f, 0.008f);
-			return;
-		case SF_REVERB_PRESET_MEDIUMER2:
-			sf_advancereverb(rv, rate, 2, 0.5f,  -7.0f,  -7.0f, 1.2f,  0.6f, 0.9f, -70.0f, 0.30f,
-				0.10f, 0.4f, 18000.0f,  300.0f, 10000.0f, 18000.0f,  1.2f, 0.016f);
-			return;
-		case SF_REVERB_PRESET_PLATEHIGH:
-			sf_advancereverb(rv, rate, 2, 0.0f, -70.0f, -20.0f, 1.0f,  1.0f, 1.0f,  -8.0f, 0.20f,
-				0.10f, 1.6f, 18000.0f, 1000.0f, 16000.0f, 18000.0f,  1.8f, 0.000f);
-			return;
-		case SF_REVERB_PRESET_PLATELOW:
-			sf_advancereverb(rv, rate, 2, 0.0f, -70.0f, -20.0f, 1.0f,  1.0f, 1.0f,  -8.0f, 0.30f,
-				0.20f, 0.4f, 18000.0f,  500.0f,  9000.0f, 18000.0f,  1.9f, 0.000f);
-			return;
-		case SF_REVERB_PRESET_LONGREVERB1:
-			sf_advancereverb(rv, rate, 2, 0.1f, -16.0f, -15.0f, 1.0f,  0.1f, 1.0f,  -5.0f, 0.35f,
-				0.05f, 1.0f, 18000.0f,  100.0f, 10000.0f, 18000.0f, 12.0f, 0.000f);
-			return;
-		case SF_REVERB_PRESET_LONGREVERB2:
-			sf_advancereverb(rv, rate, 2, 0.1f, -16.0f, -15.0f, 1.0f,  0.1f, 1.0f,  -5.0f, 0.40f,
-				0.05f, 1.0f, 18000.0f,  100.0f,  9000.0f, 18000.0f, 30.0f, 0.000f);
-			return;
+		CASE(SF_REVERB_PRESET_DEFAULT    ,  0)
+		CASE(SF_REVERB_PRESET_SMALLHALL1 ,  1)
+		CASE(SF_REVERB_PRESET_SMALLHALL2 ,  2)
+		CASE(SF_REVERB_PRESET_MEDIUMHALL1,  3)
+		CASE(SF_REVERB_PRESET_MEDIUMHALL2,  4)
+		CASE(SF_REVERB_PRESET_LARGEHALL1 ,  5)
+		CASE(SF_REVERB_PRESET_LARGEHALL2 ,  6)
+		CASE(SF_REVERB_PRESET_SMALLROOM1 ,  7)
+		CASE(SF_REVERB_PRESET_SMALLROOM2 ,  8)
+		CASE(SF_REVERB_PRESET_MEDIUMROOM1,  9)
+		CASE(SF_REVERB_PRESET_MEDIUMROOM2, 10)
+		CASE(SF_REVERB_PRESET_LARGEROOM1 , 11)
+		CASE(SF_REVERB_PRESET_LARGEROOM2 , 12)
+		CASE(SF_REVERB_PRESET_MEDIUMER1  , 13)
+		CASE(SF_REVERB_PRESET_MEDIUMER2  , 14)
+		CASE(SF_REVERB_PRESET_PLATEHIGH  , 15)
+		CASE(SF_REVERB_PRESET_PLATELOW   , 16)
+		CASE(SF_REVERB_PRESET_LONGREVERB1, 17)
+		CASE(SF_REVERB_PRESET_LONGREVERB2, 18)
 	}
+	#undef CASE
 }
 
 void sf_advancereverb(sf_reverb_state_st *rv, int rate,
