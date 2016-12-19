@@ -21,6 +21,7 @@ Simply run `./build` and the executable should be `./tgt/sndfilter`.
 Filters
 -------
 
+* [Reverb](https://en.wikipedia.org/wiki/Reverberation)
 * [Compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression)
 * [Low-Pass](https://en.wikipedia.org/wiki/Low-pass_filter) (Cutoff, Resonance)
 * [High-Pass](https://en.wikipedia.org/wiki/High-pass_filter) (Cutoff, Resonance)
@@ -34,7 +35,8 @@ Filters
 Implementation
 --------------
 
-The [compressor.c](https://github.com/voidqk/sndfilter/blob/master/src/compressor.c) and
+The [reverb.c](https://github.com/voidqk/sndfilter/blob/master/src/reverb.c),
+[compressor.c](https://github.com/voidqk/sndfilter/blob/master/src/compressor.c), and
 [biquad.c](https://github.com/voidqk/sndfilter/blob/master/src/biquad.c) are the core
 algorithms.
 
@@ -48,3 +50,8 @@ The compressor came from
 (also from Chromium), and cleaned up a bit more.  I swapped out the adaptive release curve and
 simplified the knee calculations.  I feel a little more comfortable with that algorithm because
 there isn't a whole lot of magical math involved.
+
+The reverb effect came from [Freeverb3](http://www.nongnu.org/freeverb3/), specifically the
+Progenitor2 algorithm.  It took quite of effort to tear apart the algorithm and rebuild it.  There
+might be bugs (since this is a full rewrite), but the effect sounds right.  I will continue
+investigating this algorithm.
