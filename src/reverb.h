@@ -196,6 +196,7 @@ typedef struct {
 //
 // the final reverb state structure
 //
+// note: this is about 2megs, so you might not want to throw these around willy-nilly
 typedef struct {
 	sf_rv_earlyref_st   earlyref;
 	sf_rv_oversample_st oversampleL, oversampleR;
