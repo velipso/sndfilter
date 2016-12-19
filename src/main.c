@@ -7,6 +7,7 @@
 #include "wav.h"
 #include "biquad.h"
 #include "compressor.h"
+#include "reverb.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -42,6 +43,7 @@ static int printhelp(){
 		"    lowshelf    Adds gain to lower frequencies\n"
 		"    highshelf   Adds gain to higher frequencies\n"
 		"    compressor  Dyanmic range compression, usually to make sounds louder\n"
+		"    reverb      Reverberation\n"
 		"\n"
 		"  Filter Details:\n"
 		"    lowpass <cutoff> <resonance>\n"
@@ -85,7 +87,15 @@ static int printhelp(){
 		"      knee       Decibel width of the knee (0 to 40)\n"
 		"      ratio      Ratio of compression after the threshold (1 to 20)\n"
 		"      attack     Seconds for the compression to kick in (0 to 1)\n"
-		"      release    Seconds for the compression to release (0 to 1)\n");
+		"      release    Seconds for the compression to release (0 to 1)\n"
+		"\n"
+		"    reverb <tail> <preset>\n"
+		"      tail       Seconds after input ends to allow reverb to continue\n"
+		"      preset     One of the presets below:\n"
+		"                   default, smallhall1, smallhall2, mediumhall1, mediumhall2,\n"
+		"                   largehall1, largehall2, smallroom1, smallroom2,\n"
+		"                   mediumroom1, mediumroom2, largeroom1, largeroom2, mediumer1,\n"
+		"                   mediumer2, platehigh, platelow, longreverb1, longreverb2\n");
 	return 0;
 }
 
@@ -138,6 +148,72 @@ static inline int compressor(sf_snd input_snd, sf_compressor_state_st *state, co
 	// works in subchunks of 32 samples (this is defined via SF_COMPRESSOR_SPU in compressor.c)
 	//
 	// that means the output size will be floor(input_size / 32) * 32
+
+	bool res = sf_wavsave(output_snd, output);
+	sf_snd_free(input_snd);
+	sf_snd_free(output_snd);
+	if (!res){
+		fprintf(stderr, "Error: Failed to save WAV: %s\n", output);
+		return 1;
+	}
+	return 0;
+}
+
+static inline int reverb(sf_snd input_snd, float tail, const char *preset, const char *output){
+	sf_reverb_preset p;
+	if      (strcmp(preset, "default"    ) == 0) p = SF_REVERB_PRESET_DEFAULT;
+	else if (strcmp(preset, "smallhall1" ) == 0) p = SF_REVERB_PRESET_SMALLHALL1;
+	else if (strcmp(preset, "smallhall2" ) == 0) p = SF_REVERB_PRESET_SMALLHALL2;
+	else if (strcmp(preset, "mediumhall1") == 0) p = SF_REVERB_PRESET_MEDIUMHALL1;
+	else if (strcmp(preset, "mediumhall2") == 0) p = SF_REVERB_PRESET_MEDIUMHALL2;
+	else if (strcmp(preset, "largehall1" ) == 0) p = SF_REVERB_PRESET_LARGEHALL1;
+	else if (strcmp(preset, "largehall2" ) == 0) p = SF_REVERB_PRESET_LARGEHALL2;
+	else if (strcmp(preset, "smallroom1" ) == 0) p = SF_REVERB_PRESET_SMALLROOM1;
+	else if (strcmp(preset, "smallroom2" ) == 0) p = SF_REVERB_PRESET_SMALLROOM2;
+	else if (strcmp(preset, "mediumroom1") == 0) p = SF_REVERB_PRESET_MEDIUMROOM1;
+	else if (strcmp(preset, "mediumroom2") == 0) p = SF_REVERB_PRESET_MEDIUMROOM2;
+	else if (strcmp(preset, "largeroom1" ) == 0) p = SF_REVERB_PRESET_LARGEROOM1;
+	else if (strcmp(preset, "largeroom2" ) == 0) p = SF_REVERB_PRESET_LARGEROOM2;
+	else if (strcmp(preset, "mediumer1"  ) == 0) p = SF_REVERB_PRESET_MEDIUMER1;
+	else if (strcmp(preset, "mediumer2"  ) == 0) p = SF_REVERB_PRESET_MEDIUMER2;
+	else if (strcmp(preset, "platehigh"  ) == 0) p = SF_REVERB_PRESET_PLATEHIGH;
+	else if (strcmp(preset, "platelow"   ) == 0) p = SF_REVERB_PRESET_PLATELOW;
+	else if (strcmp(preset, "longreverb1") == 0) p = SF_REVERB_PRESET_LONGREVERB1;
+	else if (strcmp(preset, "longreverb2") == 0) p = SF_REVERB_PRESET_LONGREVERB2;
+	else{
+		fprintf(stderr, "Error: Invalid reverb preset: %s\n", preset);
+		return 1;
+	}
+
+	int tailsmp = tail * input_snd->rate;
+	sf_snd output_snd = sf_snd_new(input_snd->size + tailsmp, input_snd->rate, true);
+	if (output_snd == NULL){
+		sf_snd_free(input_snd);
+		fprintf(stderr, "Error: Failed to apply filter\n");
+		return 1;
+	}
+
+	// process the reverb in one sweep
+	sf_reverb_state_st rv;
+	sf_presetreverb(&rv, input_snd->rate, p);
+	sf_reverb_process(&rv, input_snd->size, input_snd->samples, output_snd->samples);
+
+	// append the tail
+	if (tailsmp > 0){
+		int pos = 0;
+		sf_sample_st empty[48000];
+		memset(empty, 0, sizeof(sf_sample_st) * 48000);
+		while (tailsmp > 0){
+			if (tailsmp <= 48000){
+				sf_reverb_process(&rv, tailsmp, empty, output_snd->samples);
+				break;
+			}
+			else{
+				sf_reverb_process(&rv, 48000, empty, output_snd->samples);
+				tailsmp -= 48000;
+			}
+		}
+	}
 
 	bool res = sf_wavsave(output_snd, output);
 	sf_snd_free(input_snd);
@@ -220,6 +296,11 @@ int main(int argc, char **argv){
 		sf_simplecomp(&cm_state, input_snd->rate, params[0], params[1], params[2], params[3],
 			params[4], params[5]);
 		return compressor(input_snd, &cm_state, output);
+	}
+	else if (strcmp(filter, "reverb") == 0){
+		if (!getargs(argc, argv, 1, params))
+			return badargs(filter);
+		return reverb(input_snd, params[0], argv[5], output);
 	}
 
 	printhelp();

@@ -26,4 +26,5 @@ clang                         \
     "$SRC_DIR/snd.c"          \
     "$SRC_DIR/wav.c"          \
     "$SRC_DIR/biquad.c"       \
-    "$SRC_DIR/compressor.c"
+    "$SRC_DIR/compressor.c"   \
+    "$SRC_DIR/reverb.c"
