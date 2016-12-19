@@ -21,7 +21,7 @@ Simply run `./build` and the executable should be `./tgt/sndfilter`.
 Filters
 -------
 
-* [Reverb](https://en.wikipedia.org/wiki/Reverberation)
+* [Reverb](https://en.wikipedia.org/wiki/Reverberation) (Algorithmic)
 * [Compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression)
 * [Low-Pass](https://en.wikipedia.org/wiki/Low-pass_filter) (Cutoff, Resonance)
 * [High-Pass](https://en.wikipedia.org/wiki/High-pass_filter) (Cutoff, Resonance)

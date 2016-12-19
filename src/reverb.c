@@ -85,7 +85,11 @@ static inline float delay_step(sf_rv_delay_st *delay, float v){
 // delay_get(d, 2) returns the second-last written value
 // ..etc
 static inline float delay_get(sf_rv_delay_st *delay, int offset){
-	int pos = (delay->pos - offset) % delay->size;
+	if (offset > delay->size)
+		return delay->buf[delay->pos];
+	else if (offset <= 0)
+		offset = 1;
+	int pos = delay->pos - offset;
 	if (pos < 0)
 		pos += delay->size;
 	return delay->buf[pos];
@@ -104,6 +108,7 @@ static inline void iir1_makeLPF(sf_rv_iir1_st *iir1, int rate, float freq){
 	float tano2 = tanf(omega2);
 	iir1->b1 = iir1->b2 = tano2 / (1.0f + tano2);
 	iir1->a2 = (1.0f - tano2) / (1.0f + tano2);
+	iir1->y1 = 0;
 }
 
 static inline void iir1_makeHPF(sf_rv_iir1_st *iir1, int rate, float freq){
@@ -113,6 +118,7 @@ static inline void iir1_makeHPF(sf_rv_iir1_st *iir1, int rate, float freq){
 	iir1->b1 = 1.0f / (1.0f + tano2);
 	iir1->b2 = -iir1->b1;
 	iir1->a2 = (1.0f - tano2) / (1.0f + tano2);
+	iir1->y1 = 0;
 }
 
 static inline float iir1_step(sf_rv_iir1_st *iir1, float v){
@@ -127,11 +133,28 @@ static inline float iir1_step(sf_rv_iir1_st *iir1, float v){
 static inline void biquad_makeLPF(sf_rv_biquad_st *biquad, int rate, float freq, float bw){
 	float omega = 2.0f * (float)M_PI * freq / (float)rate;
 	float cs = cosf(omega);
-	float alpha = sinf(omega) * 2.0f * bw;
+	float sn = sinf(omega);
+	float alpha = sn * sinhf((float)M_LN2 * 0.5f * bw * omega / sn);
 	float a0inv = 1.0f / (1.0f + alpha);
 	biquad->b0 = a0inv * (1.0f - cs) * 0.5f;
 	biquad->b1 = 2.0f * biquad->b0;
-	biquad->b2 = biquad->b1;
+	biquad->b2 = biquad->b0;
+	biquad->a1 = a0inv * -2.0f * cs;
+	biquad->a2 = a0inv * (1.0f - alpha);
+	biquad->xn1 = 0;
+	biquad->xn2 = 0;
+	biquad->yn1 = 0;
+	biquad->yn2 = 0;
+}
+
+static inline void biquad_makeLPFQ(sf_rv_biquad_st *biquad, int rate, float freq, float bw){
+	float omega = 2.0f * (float)M_PI * freq / (float)rate;
+	float cs = cosf(omega);
+	float alpha = sinf(omega) * 2.0f * bw; // different alpha calculation than makeLPF above
+	float a0inv = 1.0f / (1.0f + alpha);
+	biquad->b0 = a0inv * (1.0f - cs) * 0.5f;
+	biquad->b1 = 2.0f * biquad->b0;
+	biquad->b2 = biquad->b0;
 	biquad->a1 = a0inv * -2.0f * cs;
 	biquad->a2 = a0inv * (1.0f - alpha);
 	biquad->xn1 = 0;
@@ -169,11 +192,6 @@ static inline float biquad_step(sf_rv_biquad_st *biquad, float v){
 //
 // earlyref
 //
-static inline void earlyref_setwidth(sf_rv_earlyref_st *earlyref, float width){
-	earlyref->wet1 = 0.5f * (width * 0.5f + 0.5f);
-	earlyref->wet2 = 0.5f * ((1.0f - width) * 0.5f);
-}
-
 static inline void earlyref_make(sf_rv_earlyref_st *earlyref, int rate, float factor, float width){
 	static const sf_sample_st delaytbl[18] = {
 		// seconds to look backwards
@@ -184,13 +202,14 @@ static inline void earlyref_make(sf_rv_earlyref_st *earlyref, int rate, float fa
 		{ 0.0753f, 0.0763f }, { 0.0797f, 0.0817f }
 	};
 
-	earlyref_setwidth(earlyref, width);
+	earlyref->wet1 = width * 0.5f + 0.5f;
+	earlyref->wet2 = (1.0f - width) * 0.5f;
 
-	int lrdelay = 0.0003f * (float)rate;
+	int lrdelay = 0.0002f * (float)rate;
 	delay_make(&earlyref->delayRL, lrdelay);
 	delay_make(&earlyref->delayLR, lrdelay);
 
-	biquad_makeAPF(&earlyref->allpassXL, rate, 750.0f, 4.0f);
+	biquad_makeAPF(&earlyref->allpassXL, rate, 740.0f, 4.0f);
 	earlyref->allpassXR = earlyref->allpassXL;
 
 	biquad_makeAPF(&earlyref->allpassL, rate, 150.0f, 4.0f);
@@ -220,9 +239,6 @@ static inline sf_sample_st earlyref_step(sf_rv_earlyref_st *earlyref, sf_sample_
 		{ 0.167f, 0.168f }, { 0.134f, 0.133f }
 	};
 
-	float L = input.L * 0.8f;
-	float R = input.R * 0.8f;
-
 	float wetL = 0, wetR = 0;
 	delay_step(&earlyref->delayPWL, input.L);
 	delay_step(&earlyref->delayPWR, input.R);
@@ -231,19 +247,19 @@ static inline sf_sample_st earlyref_step(sf_rv_earlyref_st *earlyref, sf_sample_
 		wetR += gaintbl[i].R * delay_get(&earlyref->delayPWR, earlyref->delaytblR[i]);
 	}
 
-	float L1 = delay_step(&earlyref->delayRL, input.R * wetR);
-	L1 = biquad_step(&earlyref->allpassXL, L1);
-	L1 = biquad_step(&earlyref->allpassL, earlyref->wet1 * wetL + earlyref->wet2 * L1);
-	L1 = iir1_step(&earlyref->hpfL, L1);
-	L1 = iir1_step(&earlyref->lpfL, L1);
+	float L = delay_step(&earlyref->delayRL, input.R + wetR);
+	L = biquad_step(&earlyref->allpassXL, L);
+	L = biquad_step(&earlyref->allpassL, earlyref->wet1 * wetL + earlyref->wet2 * L);
+	L = iir1_step(&earlyref->hpfL, L);
+	L = iir1_step(&earlyref->lpfL, L);
 
-	float R1 = delay_step(&earlyref->delayLR, input.L * wetL);
-	R1 = biquad_step(&earlyref->allpassXR, R1);
-	R1 = biquad_step(&earlyref->allpassR, earlyref->wet1 * wetR + earlyref->wet2 * R1);
-	R1 = iir1_step(&earlyref->hpfR, R1);
-	R1 = iir1_step(&earlyref->lpfR, R1);
+	float R = delay_step(&earlyref->delayLR, input.L + wetL);
+	R = biquad_step(&earlyref->allpassXR, R);
+	R = biquad_step(&earlyref->allpassR, earlyref->wet1 * wetR + earlyref->wet2 * R);
+	R = iir1_step(&earlyref->hpfR, R);
+	R = iir1_step(&earlyref->lpfR, R);
 
-	return (sf_sample_st){ L + L1, R + R1 };
+	return (sf_sample_st){ L, R };
 }
 
 //
@@ -251,7 +267,7 @@ static inline sf_sample_st earlyref_step(sf_rv_earlyref_st *earlyref, sf_sample_
 //
 static inline void oversample_make(sf_rv_oversample_st *oversample, int factor){
 	oversample->factor = clampi(factor, 1, SF_REVERB_OF);
-	biquad_makeLPF(&oversample->lpfU, 2 * oversample->factor, 1.0f,
+	biquad_makeLPFQ(&oversample->lpfU, 2 * oversample->factor, 1.0f,
 		0.5773502691896258f); // 1/sqrt(3)
 	oversample->lpfD = oversample->lpfU;
 }
@@ -317,7 +333,7 @@ static inline float noise_step(sf_rv_noise_st *noise){
 				float right = left;
 				left = noise->buf[i * len];
 				float midpoint = (left + right) * 0.5f;
-				float newv = midpoint + r * randfloat(); // displace the midpoint by a random amount
+				float newv = midpoint + r * (2.0f * randfloat() - 1.0f); // displace by random amt
 				noise->buf[i * len + (len / 2)] = clampf(newv, -1.0f, 1.0f);
 			}
 			len /= 2;
@@ -374,13 +390,6 @@ static inline float allpass_step(sf_rv_allpass_st *allpass, float v){
 	allpass->buf[allpass->pos] = v;
 	allpass->pos = (allpass->pos + 1) % allpass->size;
 	return out;
-}
-
-static inline float allpass_get(sf_rv_allpass_st *allpass, int offset){
-	int rp = (allpass->pos - offset) % allpass->size;
-	if (rp < 0)
-		rp += allpass->size;
-	return allpass->buf[rp];
 }
 
 //

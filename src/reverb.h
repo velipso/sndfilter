@@ -15,11 +15,11 @@
 //
 // for example, say you're processing a stream in 128 samples per chunk:
 //
-//   sf_reverb_state_st reverb;
-//   sf_foo
+//   sf_reverb_state_st rv;
+//   sf_presetreverb(&rv, SF_REVERB_PRESET_DEFAULT);
 //
 //   for each 128 length sample:
-//     sf_reverb_process(&reverb, 128, input, output);
+//     sf_reverb_process(&rv, 128, input, output);
 //
 // notice that sf_reverb_process will change a lot of the member variables inside of the state
 // structure, since these values must be carried over across chunk boundaries
