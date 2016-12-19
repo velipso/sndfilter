@@ -200,17 +200,18 @@ static inline int reverb(sf_snd input_snd, float tail, const char *preset, const
 
 	// append the tail
 	if (tailsmp > 0){
-		int pos = 0;
+		int pos = input_snd->size;
 		sf_sample_st empty[48000];
 		memset(empty, 0, sizeof(sf_sample_st) * 48000);
 		while (tailsmp > 0){
 			if (tailsmp <= 48000){
-				sf_reverb_process(&rv, tailsmp, empty, output_snd->samples);
+				sf_reverb_process(&rv, tailsmp, empty, &output_snd->samples[pos]);
 				break;
 			}
 			else{
-				sf_reverb_process(&rv, 48000, empty, output_snd->samples);
+				sf_reverb_process(&rv, 48000, empty, &output_snd->samples[pos]);
 				tailsmp -= 48000;
+				pos += 48000;
 			}
 		}
 	}
