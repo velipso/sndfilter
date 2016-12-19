@@ -674,6 +674,8 @@ void sf_advancereverb(sf_reverb_state_st *rv, int rate,
 	dccut_make(&rv->dccutL, osrate, 5.0f);
 	rv->dccutR = rv->dccutL;
 
+	noise_make(&rv->noise);
+
 	lfo_make(&rv->lfo1, osrate, spin);
 	iir1_makeLPF(&rv->lfo1_lpf, osrate, 20.0f);
 	lfo_make(&rv->lfo2, osrate, sqrtf(100.0f - (10.0f - spin) * (10.0f - spin)) * 0.5f);

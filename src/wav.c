@@ -48,7 +48,7 @@ sf_snd sf_wavload(const char *file){
 		return NULL;
 	}
 
-	uint32_t filesize = read_u32le(fp); // don't really care about this
+	read_u32le(fp); // filesize; don't really care about this
 
 	uint32_t wave = read_u32le(fp);
 	if (wave != 0x45564157){ // 'WAVE'
