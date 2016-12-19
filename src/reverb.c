@@ -422,14 +422,22 @@ static inline float allpass2_step(sf_rv_allpass2_st *allpass2, float v){
 }
 
 static inline float allpass2_get1(sf_rv_allpass2_st *allpass2, int offset){
-	int rp = (allpass2->pos1 - offset) % allpass2->size1;
+	if (offset > allpass2->size1)
+		return allpass2->buf1[allpass2->pos1];
+	else if (offset <= 0)
+		offset = 1;
+	int rp = allpass2->pos1 - offset;
 	if (rp < 0)
 		rp += allpass2->size1;
 	return allpass2->buf1[rp];
 }
 
 static inline float allpass2_get2(sf_rv_allpass2_st *allpass2, int offset){
-	int rp = (allpass2->pos2 - offset) % allpass2->size2;
+	if (offset > allpass2->size2)
+		return allpass2->buf2[allpass2->pos2];
+	else if (offset <= 0)
+		offset = 1;
+	int rp = allpass2->pos2 - offset;
 	if (rp < 0)
 		rp += allpass2->size2;
 	return allpass2->buf2[rp];
@@ -446,7 +454,7 @@ static inline void allpass3_make(sf_rv_allpass3_st *allpass3, int size1, int msi
 	if (msize1 > size1)
 		msize1 = size1;
 	int newsize = size1 + msize1;
-	allpass3->rpos1 = msize1 * 2;
+	allpass3->rpos1 = (msize1 * 2) % newsize;
 	allpass3->wpos1 = 0;
 	allpass3->pos2 = 0;
 	allpass3->pos3 = 0;
@@ -492,21 +500,33 @@ static inline float allpass3_step(sf_rv_allpass3_st *allpass3, float v, float mo
 }
 
 static inline float allpass3_get1(sf_rv_allpass3_st *allpass3, int offset){
-	int rp = (allpass3->rpos1 - offset) % allpass3->size1;
+	if (offset > allpass3->size1)
+		return allpass3->buf1[allpass3->rpos1];
+	else if (offset <= 0)
+		offset = 1;
+	int rp = allpass3->rpos1 - offset;
 	if (rp < 0)
 		rp += allpass3->size1;
 	return allpass3->buf1[rp];
 }
 
 static inline float allpass3_get2(sf_rv_allpass3_st *allpass3, int offset){
-	int rp = (allpass3->pos2 - offset) % allpass3->size2;
+	if (offset > allpass3->size2)
+		return allpass3->buf2[allpass3->pos2];
+	else if (offset <= 0)
+		offset = 1;
+	int rp = allpass3->pos2 - offset;
 	if (rp < 0)
 		rp += allpass3->size2;
 	return allpass3->buf2[rp];
 }
 
 static inline float allpass3_get3(sf_rv_allpass3_st *allpass3, int offset){
-	int rp = (allpass3->pos3 - offset) % allpass3->size3;
+	if (offset > allpass3->size3)
+		return allpass3->buf3[allpass3->pos3];
+	else if (offset <= 0)
+		offset = 1;
+	int rp = allpass3->pos3 - offset;
 	if (rp < 0)
 		rp += allpass3->size3;
 	return allpass3->buf3[rp];
@@ -522,14 +542,14 @@ static inline void allpassm_make(sf_rv_allpassm_st *allpassm, int size, int msiz
 	if (msize > size)
 		msize = size;
 	int newsize = size + msize;
-	memset(allpassm->buf, 0, sizeof(float) * newsize);
-	allpassm->rpos = msize * 2;
+	allpassm->rpos = (msize * 2) % newsize;
 	allpassm->wpos = 0;
 	allpassm->size = newsize;
 	allpassm->msize = msize;
 	allpassm->feedback = feedback;
 	allpassm->decay = decay;
 	allpassm->z1 = 0;
+	memset(allpassm->buf, 0, sizeof(float) * allpassm->size);
 }
 
 static inline float allpassm_step(sf_rv_allpassm_st *allpassm, float v, float mod, float fbmod){
@@ -561,10 +581,10 @@ static inline void comb_make(sf_rv_comb_st *comb, int size){
 }
 
 static inline float comb_step(sf_rv_comb_st *comb, float v, float feedback){
-	float out = comb->buf[comb->pos] * feedback + v;
+	v = comb->buf[comb->pos] * feedback + v;
 	comb->buf[comb->pos] = v;
 	comb->pos = (comb->pos + 1) % comb->size;
-	return out;
+	return v;
 }
 
 //
