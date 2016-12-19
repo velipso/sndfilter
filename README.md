@@ -52,6 +52,6 @@ simplified the knee calculations.  I feel a little more comfortable with that al
 there isn't a whole lot of magical math involved.
 
 The reverb effect came from [Freeverb3](http://www.nongnu.org/freeverb3/), specifically the
-Progenitor2 algorithm.  It took quite of effort to tear apart the algorithm and rebuild it.  There
-might be bugs (since this is a full rewrite), but the effect sounds right.  I will continue
-investigating this algorithm.
+Progenitor2 algorithm.  It took quite a lot of effort to tear apart the algorithm and rebuild
+it.  There might be bugs (since this is a full rewrite), but the effect sounds right.  I will
+continue investigating this algorithm.
