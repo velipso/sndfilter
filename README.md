@@ -51,7 +51,6 @@ The compressor came from
 simplified the knee calculations.  I feel a little more comfortable with that algorithm because
 there isn't a whole lot of magical math involved.
 
-The reverb effect came from [Freeverb3](http://www.nongnu.org/freeverb3/), specifically the
+The reverb effect is a complete rewrite of [Freeverb3](http://www.nongnu.org/freeverb3/)'s
 Progenitor2 algorithm.  It took quite a lot of effort to tear apart the algorithm and rebuild
-it.  There might be bugs (since this is a full rewrite), but the effect sounds right.  I will
-continue investigating this algorithm.
+it, but I'm pretty sure it's right.

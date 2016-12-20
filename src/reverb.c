@@ -601,26 +601,26 @@ void sf_presetreverb(sf_reverb_state_st *rv, int rate, sf_reverb_preset preset){
 		int osf; float p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16;
 	} ps[] = {
 
-//OSF ERtoLt ERWet Dry ERFac ERWdth Wdth Wet Wander BassB Spin  InpLP BasLP DampLP OutpLP RT60   Delay
-{1, 0.40f, -9.0f,-10, 1.6f, 0.7f, 1.0f, -0, 0.27f, 0.15f, 0.7f, 17000, 500,  7000, 10000, 3.2f, 0.020f},
-{2, 0.30f, -9.0f, -8, 1.0f, 0.7f, 1.0f, -8, 0.32f, 0.25f, 0.7f, 18000, 600,  9000, 17000, 2.1f, 0.010f},
-{1, 0.30f, -9.0f, -8, 1.0f, 0.7f, 1.0f, -8, 0.27f, 0.20f, 0.5f, 18000, 600,  7000,  9000, 2.3f, 0.010f},
-{2, 0.30f, -9.0f, -8, 1.2f, 0.7f, 1.0f, -8, 0.27f, 0.20f, 0.7f, 18000, 500,  8000, 16000, 2.8f, 0.010f},
-{1, 0.30f, -9.0f, -8, 1.2f, 0.7f, 1.0f, -8, 0.25f, 0.15f, 0.5f, 18000, 500,  6000,  8000, 2.9f, 0.010f},
-{2, 0.20f, -9.0f, -8, 1.4f, 0.7f, 1.0f, -8, 0.17f, 0.20f, 1.0f, 18000, 400,  9000, 14000, 3.8f, 0.018f},
-{2, 0.20f, -9.0f, -8, 1.5f, 0.7f, 1.0f, -8, 0.20f, 0.20f, 0.5f, 18000, 400,  5000,  7000, 4.2f, 0.018f},
-{2, 0.70f, -8.0f, -8, 0.7f,-0.4f, 0.8f, -8, 0.20f, 0.30f, 1.6f, 18000,1000, 18000, 18000, 0.5f, 0.005f},
-{3, 0.70f, -8.0f, -8, 0.8f, 0.6f, 0.9f, -8, 0.30f, 0.30f, 0.4f, 18000, 300, 10000, 18000, 0.5f, 0.005f},
-{2, 0.50f, -8.0f, -8, 1.2f,-0.4f, 0.8f, -8, 0.20f, 0.10f, 1.6f, 18000,1000, 18000, 18000, 0.8f, 0.008f},
-{2, 0.50f, -8.0f, -8, 1.2f, 0.6f, 0.9f, -8, 0.30f, 0.10f, 0.4f, 18000, 300, 10000, 18000, 1.2f, 0.016f},
-{2, 0.20f, -8.0f, -8, 2.2f,-0.4f, 0.9f, -8, 0.20f, 0.10f, 1.6f, 18000,1000, 16000, 18000, 1.8f, 0.010f},
-{2, 0.20f, -8.0f, -8, 2.2f, 0.6f, 0.9f, -8, 0.30f, 0.10f, 0.4f, 18000, 500,  9000, 18000, 1.9f, 0.020f},
-{2, 0.50f, -7.0f, -7, 1.2f,-0.4f, 0.8f,-70, 0.20f, 0.10f, 1.6f, 18000,1000, 18000, 18000, 0.8f, 0.008f},
-{2, 0.50f, -7.0f, -7, 1.2f, 0.6f, 0.9f,-70, 0.30f, 0.10f, 0.4f, 18000, 300, 10000, 18000, 1.2f, 0.016f},
-{2, 0.00f,-70.0f,-20, 1.0f, 1.0f, 1.0f, -8, 0.20f, 0.10f, 1.6f, 18000,1000, 16000, 18000, 1.8f, 0.000f},
-{2, 0.00f,-70.0f,-20, 1.0f, 1.0f, 1.0f, -8, 0.30f, 0.20f, 0.4f, 18000, 500,  9000, 18000, 1.9f, 0.000f},
-{2, 0.10f,-16.0f,-15, 1.0f, 0.1f, 1.0f, -5, 0.35f, 0.05f, 1.0f, 18000, 100, 10000, 18000,12.0f, 0.000f},
-{2, 0.10f,-16.0f,-15, 1.0f, 0.1f, 1.0f, -5, 0.40f, 0.05f, 1.0f, 18000, 100,  9000, 18000,30.0f, 0.000f}
+//OSF ERtoLt ERWet Dry ERFac ERWdth Wdth Wet Wander BassB Spin InpLP BasLP DmpLP OutLP RT60  Delay
+{1, 0.40f, -9.0f,-10, 1.6f, 0.7f, 1.0f, -0, 0.27f, 0.15f, 0.7f,17000, 500, 7000,10000, 3.2f,0.020f},
+{2, 0.30f, -9.0f, -8, 1.0f, 0.7f, 1.0f, -8, 0.32f, 0.25f, 0.7f,18000, 600, 9000,17000, 2.1f,0.010f},
+{1, 0.30f, -9.0f, -8, 1.0f, 0.7f, 1.0f, -8, 0.27f, 0.20f, 0.5f,18000, 600, 7000, 9000, 2.3f,0.010f},
+{2, 0.30f, -9.0f, -8, 1.2f, 0.7f, 1.0f, -8, 0.27f, 0.20f, 0.7f,18000, 500, 8000,16000, 2.8f,0.010f},
+{1, 0.30f, -9.0f, -8, 1.2f, 0.7f, 1.0f, -8, 0.25f, 0.15f, 0.5f,18000, 500, 6000, 8000, 2.9f,0.010f},
+{2, 0.20f, -9.0f, -8, 1.4f, 0.7f, 1.0f, -8, 0.17f, 0.20f, 1.0f,18000, 400, 9000,14000, 3.8f,0.018f},
+{2, 0.20f, -9.0f, -8, 1.5f, 0.7f, 1.0f, -8, 0.20f, 0.20f, 0.5f,18000, 400, 5000, 7000, 4.2f,0.018f},
+{2, 0.70f, -8.0f, -8, 0.7f,-0.4f, 0.8f, -8, 0.20f, 0.30f, 1.6f,18000,1000,18000,18000, 0.5f,0.005f},
+{3, 0.70f, -8.0f, -8, 0.8f, 0.6f, 0.9f, -8, 0.30f, 0.30f, 0.4f,18000, 300,10000,18000, 0.5f,0.005f},
+{2, 0.50f, -8.0f, -8, 1.2f,-0.4f, 0.8f, -8, 0.20f, 0.10f, 1.6f,18000,1000,18000,18000, 0.8f,0.008f},
+{2, 0.50f, -8.0f, -8, 1.2f, 0.6f, 0.9f, -8, 0.30f, 0.10f, 0.4f,18000, 300,10000,18000, 1.2f,0.016f},
+{2, 0.20f, -8.0f, -8, 2.2f,-0.4f, 0.9f, -8, 0.20f, 0.10f, 1.6f,18000,1000,16000,18000, 1.8f,0.010f},
+{2, 0.20f, -8.0f, -8, 2.2f, 0.6f, 0.9f, -8, 0.30f, 0.10f, 0.4f,18000, 500, 9000,18000, 1.9f,0.020f},
+{2, 0.50f, -7.0f, -7, 1.2f,-0.4f, 0.8f,-70, 0.20f, 0.10f, 1.6f,18000,1000,18000,18000, 0.8f,0.008f},
+{2, 0.50f, -7.0f, -7, 1.2f, 0.6f, 0.9f,-70, 0.30f, 0.10f, 0.4f,18000, 300,10000,18000, 1.2f,0.016f},
+{2, 0.00f,-70.0f,-20, 1.0f, 1.0f, 1.0f, -8, 0.20f, 0.10f, 1.6f,18000,1000,16000,18000, 1.8f,0.000f},
+{2, 0.00f,-70.0f,-20, 1.0f, 1.0f, 1.0f, -8, 0.30f, 0.20f, 0.4f,18000, 500, 9000,18000, 1.9f,0.000f},
+{2, 0.10f,-16.0f,-15, 1.0f, 0.1f, 1.0f, -5, 0.35f, 0.05f, 1.0f,18000, 100,10000,18000,12.0f,0.000f},
+{2, 0.10f,-16.0f,-15, 1.0f, 0.1f, 1.0f, -5, 0.40f, 0.05f, 1.0f,18000, 100, 9000,18000,30.0f,0.000f}
 
 	};
 
@@ -704,9 +704,9 @@ void sf_advancereverb(sf_reverb_state_st *rv, int rate,
 	delay_make(&rv->cdelayL , nextprime(1572 * totfactor));
 	delay_make(&rv->cdelayR , nextprime(  16 * totfactor));
 	delay_make(&rv->dampdL  , nextprime(   2 * totfactor));
-	delay_make(&rv->dampdR  , nextprime( 625 * totfactor));
+	delay_make(&rv->dampdR  , nextprime(       totfactor));
 	delay_make(&rv->cbassd1L, nextprime(1055 * totfactor));
-	delay_make(&rv->cbassd1R, nextprime( 835 * totfactor));
+	delay_make(&rv->cbassd1R, nextprime(1460 * totfactor));
 	delay_make(&rv->cbassd2L, nextprime( 344 * totfactor));
 	delay_make(&rv->cbassd2R, nextprime( 500 * totfactor));
 
@@ -724,7 +724,7 @@ void sf_advancereverb(sf_reverb_state_st *rv, int rate,
 	float decay2 = powf(10.0f, log10f(0.844f) / rt60);
 	float decay3 = powf(10.0f, log10f(0.906f) / rt60);
 	rv->loopdecay = decay0;
-	msize = 32 * osrate / 34125;
+	msize = nextprime(32 * totfactor);
 	allpassm_make(&rv->dampap1L, nextprime(239 * totfactor), msize, 0.375f, decay2);
 	allpassm_make(&rv->dampap1R, nextprime(205 * totfactor), msize, 0.375f, decay2);
 	allpassm_make(&rv->dampap2L, nextprime(392 * totfactor), msize, 0.312f, decay3);
@@ -917,8 +917,8 @@ void sf_reverb_process(sf_reverb_state_st *rv, int size, sf_sample_st *input, sf
 
 		float outL = oversample_stepdown(&rv->oversampleL, osL);
 		float outR = oversample_stepdown(&rv->oversampleR, osR);
-		erL += outL * rv->erefwet + input[i].L * rv->dry;
-		erR += outR * rv->erefwet + input[i].R * rv->dry;
-		output[i] = (sf_sample_st){ erL, erR };
+		outL += er.L * rv->erefwet + input[i].L * rv->dry;
+		outR += er.R * rv->erefwet + input[i].R * rv->dry;
+		output[i] = (sf_sample_st){ outL, outR };
 	}
 }
