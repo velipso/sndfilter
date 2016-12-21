@@ -299,7 +299,7 @@ int main(int argc, char **argv){
 		return compressor(input_snd, &cm_state, output);
 	}
 	else if (strcmp(filter, "reverb") == 0){
-		if (!getargs(argc, argv, 1, params))
+		if (argc < 6 || !getargs(argc, argv, 1, params))
 			return badargs(filter);
 		return reverb(input_snd, params[0], argv[5], output);
 	}
