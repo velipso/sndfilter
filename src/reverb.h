@@ -16,7 +16,7 @@
 // for example, say you're processing a stream in 128 samples per chunk:
 //
 //   sf_reverb_state_st rv;
-//   sf_presetreverb(&rv, SF_REVERB_PRESET_DEFAULT);
+//   sf_presetreverb(&rv, 44100, SF_REVERB_PRESET_DEFAULT);
 //
 //   for each 128 length sample:
 //     sf_reverb_process(&rv, 128, input, output);

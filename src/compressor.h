@@ -18,7 +18,7 @@
 // for example, say you're processing a stream in 128 samples per chunk:
 //
 //   sf_compressor_state_st simplecomp;
-//   sf_simplecomp(&simplecomp, 5, -24, 30, 12, 0.003f, 0.250f);
+//   sf_simplecomp(&simplecomp, 48000, 5, -24, 30, 12, 0.003f, 0.250f);
 //
 //   for each 128 length sample:
 //     sf_compressor_process(&simplecomp, 128, input, output);

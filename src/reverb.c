@@ -104,6 +104,7 @@ static inline float delay_getlast(sf_rv_delay_st *delay){
 //
 static inline void iir1_makeLPF(sf_rv_iir1_st *iir1, int rate, float freq){
 	// 1st order IIR lowpass filter (Butterworth)
+	freq = clampf(freq, 0, rate / 2);
 	float omega2 = (float)M_PI * freq / (float)rate;
 	float tano2 = tanf(omega2);
 	iir1->b1 = iir1->b2 = tano2 / (1.0f + tano2);
@@ -113,6 +114,7 @@ static inline void iir1_makeLPF(sf_rv_iir1_st *iir1, int rate, float freq){
 
 static inline void iir1_makeHPF(sf_rv_iir1_st *iir1, int rate, float freq){
 	// 1st order IIR highpass filter (Butterworth)
+	freq = clampf(freq, 0, rate / 2);
 	float omega2 = (float)M_PI * freq / (float)rate;
 	float tano2 = tanf(omega2);
 	iir1->b1 = 1.0f / (1.0f + tano2);
@@ -131,6 +133,7 @@ static inline float iir1_step(sf_rv_iir1_st *iir1, float v){
 // biquad
 //
 static inline void biquad_makeLPF(sf_rv_biquad_st *biquad, int rate, float freq, float bw){
+	freq = clampf(freq, 0, rate / 2);
 	float omega = 2.0f * (float)M_PI * freq / (float)rate;
 	float cs = cosf(omega);
 	float sn = sinf(omega);
@@ -148,6 +151,7 @@ static inline void biquad_makeLPF(sf_rv_biquad_st *biquad, int rate, float freq,
 }
 
 static inline void biquad_makeLPFQ(sf_rv_biquad_st *biquad, int rate, float freq, float bw){
+	freq = clampf(freq, 0, rate / 2);
 	float omega = 2.0f * (float)M_PI * freq / (float)rate;
 	float cs = cosf(omega);
 	float alpha = sinf(omega) * 2.0f * bw; // different alpha calculation than makeLPF above
@@ -164,6 +168,7 @@ static inline void biquad_makeLPFQ(sf_rv_biquad_st *biquad, int rate, float freq
 }
 
 static inline void biquad_makeAPF(sf_rv_biquad_st *biquad, int rate, float freq, float bw){
+	freq = clampf(freq, 0, rate / 2);
 	float omega = 2.0f * (float)M_PI * freq / (float)rate;
 	float sn = sinf(omega);
 	float alpha = sn * sinhf((float)M_LN2 * 0.5f * bw * omega / sn);
@@ -296,6 +301,7 @@ static inline float oversample_stepdown(sf_rv_oversample_st *oversample, float *
 // dccut
 //
 static inline void dccut_make(sf_rv_dccut_st *dccut, int rate, float freq){
+	freq = clampf(freq, 0, rate / 2);
 	float ang = 2.0f * (float)M_PI * freq / (float)rate;
 	float sn = sinf(ang);
 	float sqrt3 = 1.7320508075688772f;
