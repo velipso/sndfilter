@@ -86,8 +86,7 @@ void sf_advancecomp(sf_compressor_state_st *state, int rate, float pregain, floa
 		delaybufsize = 1;
 	else if (delaybufsize > SF_COMPRESSOR_MAXDELAY)
 		delaybufsize = SF_COMPRESSOR_MAXDELAY;
-	if (delaybufsize > 0)
-		memset(state->delaybuf, 0, sizeof(sf_sample_st) * delaybufsize);
+        memset(state->delaybuf, 0, sizeof(sf_sample_st) * delaybufsize);
 
 	// useful values
 	float linearpregain = db2lin(pregain);
