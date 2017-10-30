@@ -153,7 +153,6 @@ void sf_advancecomp(sf_compressor_state_st *state, int rate, float pregain, floa
 	state->slope                = slope;
 	state->attacksamplesinv     = attacksamplesinv;
 	state->satreleasesamplesinv = satreleasesamplesinv;
-	state->wet                  = wet;
 	state->dry                  = dry;
 	state->k                    = k;
 	state->kneedboffset         = kneedboffset;
