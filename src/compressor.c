@@ -107,8 +107,8 @@ void sf_advancecomp(sf_compressor_state_st *state, int rate, float pregain, floa
 
 	// calculate knee curve parameters
 	float k = 5.0f; // initial guess
-	float kneedboffset;
-	float linearthresholdknee;
+        float kneedboffset = 0.0f;
+        float linearthresholdknee = 0.0f;
 	if (knee > 0.0f){ // if a knee exists, search for a good k value
 		float xknee = db2lin(threshold + knee);
 		float mink = 0.1f;
