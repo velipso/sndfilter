@@ -16,7 +16,7 @@ Build Instructions
 ------------------
 
 The `./build` script is a simple bash script that compiles the source files using `clang`.  It's
-dirt simple, [I promise](https://github.com/voidqk/sndfilter/blob/master/build).
+dirt simple, [I promise](https://github.com/velipso/sndfilter/blob/master/build).
 
 Simply run `./build` and the executable should be `./tgt/sndfilter`.
 
@@ -37,9 +37,9 @@ Filters
 Implementation
 --------------
 
-The [reverb.c](https://github.com/voidqk/sndfilter/blob/master/src/reverb.c),
-[compressor.c](https://github.com/voidqk/sndfilter/blob/master/src/compressor.c), and
-[biquad.c](https://github.com/voidqk/sndfilter/blob/master/src/biquad.c) are the core
+The [reverb.c](https://github.com/velipso/sndfilter/blob/master/src/reverb.c),
+[compressor.c](https://github.com/velipso/sndfilter/blob/master/src/compressor.c), and
+[biquad.c](https://github.com/velipso/sndfilter/blob/master/src/biquad.c) are the core
 algorithms.
 
 I do not understand the biquad math, so please don't ask me any questions :-).  The core formulas

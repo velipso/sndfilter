@@ -1,6 +1,6 @@
-// (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
+// (c) Copyright 2016, Sean Connelly (@velipso), https://sean.cm
 // MIT License
-// Project Home: https://github.com/voidqk/sndfilter
+// Project Home: https://github.com/velipso/sndfilter
 
 // data structure for a 2-channel 32-bit floating point sound in memory
 

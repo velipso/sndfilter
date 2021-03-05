@@ -1,6 +1,6 @@
-// (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
+// (c) Copyright 2016, Sean Connelly (@velipso), https://sean.cm
 // MIT License
-// Project Home: https://github.com/voidqk/sndfilter
+// Project Home: https://github.com/velipso/sndfilter
 
 // dynamics compressor based on WebAudio specification:
 //   https://webaudio.github.io/web-audio-api/#the-dynamicscompressornode-interface

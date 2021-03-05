@@ -1,6 +1,6 @@
-// (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
+// (c) Copyright 2016, Sean Connelly (@velipso), https://sean.cm
 // MIT License
-// Project Home: https://github.com/voidqk/sndfilter
+// Project Home: https://github.com/velipso/sndfilter
 
 // simple .wav file loading and saving
 // only handles loading 1 or 2 channel WAVs with 16-bit samples

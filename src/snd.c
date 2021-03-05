@@ -1,6 +1,6 @@
-// (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
+// (c) Copyright 2016, Sean Connelly (@velipso), https://sean.cm
 // MIT License
-// Project Home: https://github.com/voidqk/sndfilter
+// Project Home: https://github.com/velipso/sndfilter
 
 #include "snd.h"
 #include "mem.h"

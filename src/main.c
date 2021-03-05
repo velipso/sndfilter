@@ -1,6 +1,6 @@
-// (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
+// (c) Copyright 2016, Sean Connelly (@velipso), https://sean.cm
 // MIT License
-// Project Home: https://github.com/voidqk/sndfilter
+// Project Home: https://github.com/velipso/sndfilter
 
 // main entry point, used as a simple demo of the features of the library
 
@@ -15,9 +15,9 @@
 static int printabout(){
 	printf(
 		"sndfilter - simple demonstrations of common sound filters\n"
-		"(c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc\n"
+		"(c) Copyright 2016, Sean Connelly (@velipso), https://sean.cm\n"
 		"MIT License\n"
-		"Project Home: https://github.com/voidqk/sndfilter\n");
+		"Project Home: https://github.com/velipso/sndfilter\n");
 	return 0;
 }
 
