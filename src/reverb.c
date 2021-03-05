@@ -133,17 +133,24 @@ static inline float iir1_step(sf_rv_iir1_st *iir1, float v){
 // biquad
 //
 static inline void biquad_makeLPF(sf_rv_biquad_st *biquad, int rate, float freq, float bw){
-	freq = clampf(freq, 0, rate / 2);
-	float omega = 2.0f * (float)M_PI * freq / (float)rate;
-	float cs = cosf(omega);
-	float sn = sinf(omega);
-	float alpha = sn * sinhf((float)M_LN2 * 0.5f * bw * omega / sn);
-	float a0inv = 1.0f / (1.0f + alpha);
-	biquad->b0 = a0inv * (1.0f - cs) * 0.5f;
-	biquad->b1 = 2.0f * biquad->b0;
-	biquad->b2 = biquad->b0;
-	biquad->a1 = a0inv * -2.0f * cs;
-	biquad->a2 = a0inv * (1.0f - alpha);
+	if (freq <= 0) // filter everything out
+		biquad->b0 = biquad->b1 = biquad->b2 = biquad->a1 = biquad->a2 = 0;
+	else if (freq >= rate / 2){ // filter nothing out
+		biquad->b0 = 1.0f;
+		biquad->b1 = biquad->b2 = biquad->a1 = biquad->a2 = 0;
+	}
+	else{
+		float omega = 2.0f * (float)M_PI * freq / (float)rate;
+		float cs = cosf(omega);
+		float sn = sinf(omega);
+		float alpha = sn * sinhf((float)M_LN2 * 0.5f * bw * omega / sn);
+		float a0inv = 1.0f / (1.0f + alpha);
+		biquad->b0 = a0inv * (1.0f - cs) * 0.5f;
+		biquad->b1 = 2.0f * biquad->b0;
+		biquad->b2 = biquad->b0;
+		biquad->a1 = a0inv * -2.0f * cs;
+		biquad->a2 = a0inv * (1.0f - alpha);
+	}
 	biquad->xn1 = 0;
 	biquad->xn2 = 0;
 	biquad->yn1 = 0;
