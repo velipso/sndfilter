@@ -292,9 +292,10 @@ static inline void oversample_stepup(sf_rv_oversample_st *oversample, float inpu
 static inline float oversample_stepdown(sf_rv_oversample_st *oversample, float *input){
 	if (oversample->factor == 1)
 		return input[0];
-	for (int i = 0; i < oversample->factor; i++)
+	float out = biquad_step(&oversample->lpfD, input[0]);
+	for (int i = 1; i < oversample->factor; i++)
 		biquad_step(&oversample->lpfD, input[i]);
-	return input[0];
+	return out;
 }
 
 //
