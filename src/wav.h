@@ -9,9 +9,14 @@
 #ifndef SNDFILTER_WAV__H
 #define SNDFILTER_WAV__H
 
+#include "sf_common.h"
 #include "snd.h"
+
+SF_API_BEGIN
 
 sf_snd sf_wavload(const char *file);
 bool   sf_wavsave(sf_snd snd, const char *file);
+
+SF_API_END
 
 #endif // SNDFILTER_WAV__H

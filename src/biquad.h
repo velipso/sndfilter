@@ -8,6 +8,7 @@
 #ifndef SNDFILTER_BIQUAD__H
 #define SNDFILTER_BIQUAD__H
 
+#include "sf_common.h"
 #include "snd.h"
 
 // biquad filtering is a technique used to perform a variety of sound filters
@@ -41,6 +42,8 @@ typedef struct {
 	sf_sample_st yn2;
 } sf_biquad_state_st;
 
+SF_API_BEGIN
+
 // these functions will initialize an sf_biquad_state_st structure based on the desired filter
 void sf_lowpass  (sf_biquad_state_st *state, int rate, float cutoff, float resonance);
 void sf_highpass (sf_biquad_state_st *state, int rate, float cutoff, float resonance);
@@ -55,5 +58,7 @@ void sf_highshelf(sf_biquad_state_st *state, int rate, float freq, float Q, floa
 // the input and output buffers should be the same size
 void sf_biquad_process(sf_biquad_state_st *state, int size, sf_sample_st *input,
 	sf_sample_st *output);
+
+SF_API_END
 
 #endif // SNDFILTER_BIQUAD__H
