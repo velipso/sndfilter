@@ -8,6 +8,7 @@
 #define SNDFILTER_SND__H
 
 #include <stdbool.h>
+#include "sf_common.h"
 
 typedef struct {
 	float L; // left channel sample
@@ -20,7 +21,11 @@ typedef struct {
 	int rate; // samples per second
 } sf_snd_st, *sf_snd;
 
+SF_API_BEGIN
+
 sf_snd sf_snd_new(int size, int rate, bool clear);
 void   sf_snd_free(sf_snd snd);
+
+SF_API_END
 
 #endif // SNDFILTER_SND__H

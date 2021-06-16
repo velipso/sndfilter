@@ -8,7 +8,10 @@
 #ifndef SNDFILTER_REVERB__H
 #define SNDFILTER_REVERB__H
 
+#include "sf_common.h"
 #include "snd.h"
+
+SF_API_BEGIN
 
 // this API works by first initializing an sf_reverb_state_st structure, then using it to process a
 // sample in chunks
@@ -285,5 +288,7 @@ void sf_advancereverb(sf_reverb_state_st *rv,
 // the input and output buffers should be the same size
 void sf_reverb_process(sf_reverb_state_st *state, int size, sf_sample_st *input,
 	sf_sample_st *output);
+
+SF_API_END
 
 #endif // SNDFILTER_REVERB__H

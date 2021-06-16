@@ -8,6 +8,7 @@
 #ifndef SNDFILTER_COMPRESSOR__H
 #define SNDFILTER_COMPRESSOR__H
 
+#include "sf_common.h"
 #include "snd.h"
 
 // dynamic range compression is a complex topic with many different algorithms
@@ -75,6 +76,8 @@ typedef struct {
 	sf_sample_st delaybuf[SF_COMPRESSOR_MAXDELAY]; // predelay buffer
 } sf_compressor_state_st;
 
+SF_API_BEGIN
+
 // populate a compressor state with all default values
 void sf_defaultcomp(sf_compressor_state_st *state, int rate);
 
@@ -107,5 +110,7 @@ void sf_advancecomp(sf_compressor_state_st *state,
 // the input and output buffers should be the same size
 void sf_compressor_process(sf_compressor_state_st *state, int size, sf_sample_st *input,
 	sf_sample_st *output);
+
+SF_API_END
 
 #endif // SNDFILTER_COMPRESSOR__H
