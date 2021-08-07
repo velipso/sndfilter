@@ -20,6 +20,13 @@ dirt simple, [I promise](https://github.com/velipso/sndfilter/blob/master/build)
 
 Simply run `./build` and the executable should be `./tgt/sndfilter`.
 
+If you're using `meson` build system, then:
+
+```sh
+meson setup build-dir
+meson compile -C build-dir
+```
+
 Filters
 -------
 
