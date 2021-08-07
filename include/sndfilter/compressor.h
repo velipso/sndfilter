@@ -8,7 +8,7 @@
 #ifndef SNDFILTER_COMPRESSOR__H
 #define SNDFILTER_COMPRESSOR__H
 
-#include "snd.h"
+#include "sndfilter/snd.h"
 
 // dynamic range compression is a complex topic with many different algorithms
 //

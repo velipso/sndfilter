@@ -2,7 +2,7 @@
 // MIT License
 // Project Home: https://github.com/velipso/sndfilter
 
-#include "reverb.h"
+#include "sndfilter/reverb.h"
 #include <math.h>
 #include <stdint.h>
 #include <stdbool.h>

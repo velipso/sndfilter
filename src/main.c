@@ -4,10 +4,10 @@
 
 // main entry point, used as a simple demo of the features of the library
 
-#include "wav.h"
-#include "biquad.h"
-#include "compressor.h"
-#include "reverb.h"
+#include "sndfilter/wav.h"
+#include "sndfilter/biquad.h"
+#include "sndfilter/compressor.h"
+#include "sndfilter/reverb.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -2,7 +2,7 @@
 // MIT License
 // Project Home: https://github.com/velipso/sndfilter
 
-#include "snd.h"
+#include "sndfilter/snd.h"
 #include "mem.h"
 #include <string.h>
 

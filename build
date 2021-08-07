@@ -8,6 +8,7 @@ pushd "$(dirname "$0")" > /dev/null
 SCRIPT_DIR="$(pwd)"
 popd > /dev/null
 
+INC_DIR="$SCRIPT_DIR/include"
 SRC_DIR="$SCRIPT_DIR/src"
 TGT_DIR="$SCRIPT_DIR/tgt"
 
@@ -18,6 +19,7 @@ mkdir -p "$TGT_DIR"
 # -fwrapv   integers should wrap around like normal
 # -Werror   elevate warnings to errors
 clang                         \
+    -I "$INC_DIR"             \
     -o "$TGT_DIR/sndfilter"   \
     -fwrapv                   \
     -Werror                   \

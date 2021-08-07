@@ -8,7 +8,7 @@
 #ifndef SNDFILTER_BIQUAD__H
 #define SNDFILTER_BIQUAD__H
 
-#include "snd.h"
+#include "sndfilter/snd.h"
 
 // biquad filtering is a technique used to perform a variety of sound filters
 //

@@ -2,7 +2,7 @@
 // MIT License
 // Project Home: https://github.com/velipso/sndfilter
 
-#include "biquad.h"
+#include "sndfilter/biquad.h"
 #include <math.h>
 
 // biquad filtering is based on a small sliding window, where the different filters are a result of

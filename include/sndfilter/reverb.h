@@ -8,7 +8,7 @@
 #ifndef SNDFILTER_REVERB__H
 #define SNDFILTER_REVERB__H
 
-#include "snd.h"
+#include "sndfilter/snd.h"
 
 // this API works by first initializing an sf_reverb_state_st structure, then using it to process a
 // sample in chunks

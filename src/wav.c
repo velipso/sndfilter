@@ -2,7 +2,7 @@
 // MIT License
 // Project Home: https://github.com/velipso/sndfilter
 
-#include "wav.h"
+#include "sndfilter/wav.h"
 #include <stdio.h>
 #include <stdint.h>
 

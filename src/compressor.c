@@ -2,7 +2,7 @@
 // MIT License
 // Project Home: https://github.com/velipso/sndfilter
 
-#include "compressor.h"
+#include "sndfilter/compressor.h"
 #include <math.h>
 #include <string.h>
 
