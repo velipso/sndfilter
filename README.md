@@ -20,6 +20,14 @@ dirt simple, [I promise](https://github.com/velipso/sndfilter/blob/master/build)
 
 Simply run `./build` and the executable should be `./tgt/sndfilter`.
 
+### C++ Support
+
+This project is pure C, but I've left PRs open for those who want C++ support.  Check them out, they
+might save you some time:
+
+* [C++ headers](https://github.com/velipso/sndfilter/pull/18)
+* [Meson build system support](https://github.com/velipso/sndfilter/pull/19)
+
 Filters
 -------
 
