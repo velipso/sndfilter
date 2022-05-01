@@ -1,0 +1,18 @@
+# Namespaced project name that the target belongs to
+project: jbgreenh/sndfilter
+
+# Target name (should be unique within the project)
+target: sndfilter
+
+# Base image to run the binary in.
+image: ghcr.io/jbgreenh/sndfilter:latest
+
+# List of commands used to test the target
+cmds:
+
+    # Command used to start the target, "@@" is the input file
+    # (when "@@" is omitted Mayhem defaults to stdin inputs)
+    - cmd: /sndfilter @@ <reverb> <5> <longreverb1>
+    - cmd: /sndfilter @@ <lowshelf> <1000> <100> <100>
+    - cmd: /sndfilter @@ <highshelf> <10000> <1000> <100>
+    - cmd: /sndfilter @@ <allpass> <1000> <1000>
