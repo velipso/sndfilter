@@ -4,9 +4,6 @@ project: jbgreenh/sndfilter
 # Target name (should be unique within the project)
 target: sndfilter
 
-# Base image to run the binary in.
-image: ghcr.io/jbgreenh/sndfilter:latest
-
 # List of commands used to test the target
 cmds:
 
