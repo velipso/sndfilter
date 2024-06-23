@@ -1,6 +1,9 @@
-// (c) Copyright 2016, Sean Connelly (@velipso), https://sean.cm
-// MIT License
+//
+// sndfilter - Algorithms for sound filters, like reverb, lowpass, etc
+// by Sean Connelly (@velipso), https://sean.fun
 // Project Home: https://github.com/velipso/sndfilter
+// SPDX-License-Identifier: 0BSD
+//
 
 // main entry point, used as a simple demo of the features of the library
 
@@ -15,9 +18,10 @@
 static int printabout(){
 	printf(
 		"sndfilter - simple demonstrations of common sound filters\n"
-		"(c) Copyright 2016, Sean Connelly (@velipso), https://sean.cm\n"
-		"MIT License\n"
-		"Project Home: https://github.com/velipso/sndfilter\n");
+		"by Sean Connelly (@velipso), https://sean.fun\n"
+		"Project Home: https://github.com/velipso/sndfilter\n"
+		"SPDX-License-Identifier: 0BSD\n"
+	);
 	return 0;
 }
 

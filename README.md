@@ -10,7 +10,7 @@ the programming community.
 
 Please note that I favored simple code over fast code.  Hopefully it's made it more understandable.
 
-(MIT License)
+(0BSD License)
 
 Build Instructions
 ------------------

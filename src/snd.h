@@ -1,6 +1,9 @@
-// (c) Copyright 2016, Sean Connelly (@velipso), https://sean.cm
-// MIT License
+//
+// sndfilter - Algorithms for sound filters, like reverb, lowpass, etc
+// by Sean Connelly (@velipso), https://sean.fun
 // Project Home: https://github.com/velipso/sndfilter
+// SPDX-License-Identifier: 0BSD
+//
 
 // data structure for a 2-channel 32-bit floating point sound in memory
 

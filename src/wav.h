@@ -1,6 +1,9 @@
-// (c) Copyright 2016, Sean Connelly (@velipso), https://sean.cm
-// MIT License
+//
+// sndfilter - Algorithms for sound filters, like reverb, lowpass, etc
+// by Sean Connelly (@velipso), https://sean.fun
 // Project Home: https://github.com/velipso/sndfilter
+// SPDX-License-Identifier: 0BSD
+//
 
 // simple .wav file loading and saving
 // only handles loading 1 or 2 channel WAVs with 16-bit samples
