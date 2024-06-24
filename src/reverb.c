@@ -637,7 +637,8 @@ void sf_presetreverb(sf_reverb_state_st *rv, int rate, sf_reverb_preset preset){
 {2, 0.00f,-70.0f,-20, 1.0f, 1.0f, 1.0f, -8, 0.20f, 0.10f, 1.6f,18000,1000,16000,18000, 1.8f,0.000f},
 {2, 0.00f,-70.0f,-20, 1.0f, 1.0f, 1.0f, -8, 0.30f, 0.20f, 0.4f,18000, 500, 9000,18000, 1.9f,0.000f},
 {2, 0.10f,-16.0f,-15, 1.0f, 0.1f, 1.0f, -5, 0.35f, 0.05f, 1.0f,18000, 100,10000,18000,12.0f,0.000f},
-{2, 0.10f,-16.0f,-15, 1.0f, 0.1f, 1.0f, -5, 0.40f, 0.05f, 1.0f,18000, 100, 9000,18000,30.0f,0.000f}
+{2, 0.10f,-16.0f,-15, 1.0f, 0.1f, 1.0f, -5, 0.40f, 0.05f, 1.0f,18000, 100, 9000,18000,30.0f,0.000f},
+{2, 0.10f,-10.0f,-30, 1.3f, 0.1f, 1.0f, -15, 0.40f, 0.05f, 1.2f,18000, 1000, 9000,18000, 2.0f,0.01f}
 
 	};
 
@@ -665,6 +666,7 @@ void sf_presetreverb(sf_reverb_state_st *rv, int rate, sf_reverb_preset preset){
 		CASE(SF_REVERB_PRESET_PLATELOW   , 16)
 		CASE(SF_REVERB_PRESET_LONGREVERB1, 17)
 		CASE(SF_REVERB_PRESET_LONGREVERB2, 18)
+		CASE(SF_REVERB_PRESET_SOFT, 19)
 	}
 	#undef CASE
 }

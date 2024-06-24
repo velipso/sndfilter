@@ -99,7 +99,7 @@ static int printhelp(){
 		"                   default, smallhall1, smallhall2, mediumhall1, mediumhall2,\n"
 		"                   largehall1, largehall2, smallroom1, smallroom2,\n"
 		"                   mediumroom1, mediumroom2, largeroom1, largeroom2, mediumer1,\n"
-		"                   mediumer2, platehigh, platelow, longreverb1, longreverb2\n");
+		"                   mediumer2, platehigh, platelow, longreverb1, longreverb2, soft\n");
 	return 0;
 }
 
@@ -184,6 +184,7 @@ static inline int reverb(sf_snd input_snd, float tail, const char *preset, const
 	else if (strcmp(preset, "platelow"   ) == 0) p = SF_REVERB_PRESET_PLATELOW;
 	else if (strcmp(preset, "longreverb1") == 0) p = SF_REVERB_PRESET_LONGREVERB1;
 	else if (strcmp(preset, "longreverb2") == 0) p = SF_REVERB_PRESET_LONGREVERB2;
+	else if (strcmp(preset, "soft") == 0) p = SF_REVERB_PRESET_SOFT;
 	else{
 		fprintf(stderr, "Error: Invalid reverb preset: %s\n", preset);
 		return 1;
